@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Healthy Lifers</string>
+    <string name="title_maps">Maps</string>
+    <string name="title_myfriends">My friends</string>
+    <string name="title_myprofile">My profile</string>
+    <string name="title_world_score">World score</string>
+    <string name="app_bar_search">Search</string>
+    <string name="app_bar_settings_title">Settings</string>
+    <string name="btnExit_title">Exit</string>
+</resources>

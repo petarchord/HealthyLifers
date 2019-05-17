@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="com.healthyteam.android.healthylifers.MainActivity">
+    <item
+        android:id="@+id/app_bar_search"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="@string/app_bar_search"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/app_bar_settings"
+        android:icon="@drawable/baseline_settings_black_24"
+        android:title="@string/app_bar_settings_title"
+        app:showAsAction="always" />
+</menu>

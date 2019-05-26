@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.support.v4.app.Fragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,21 +19,25 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment selectedFragment = null;
             switch (item.getItemId()) {
-                case R.id.navigation_maps:
-                    mTextMessage.setText(R.string.title_maps);
-                    return true;
+                case R.id.navigation_map:
+                    selectedFragment=new MapFragment();
+                    break;
                 case R.id.navigation_myprofile:
-                    mTextMessage.setText(R.string.title_myprofile);
-                    return true;
+                    selectedFragment=new MyProfileFragment();
+                    break;
                 case R.id.navigation_myfriends:
-                    mTextMessage.setText(R.string.title_myfriends);
-                    return true;
+                    selectedFragment=new MyFriendsFragment();
+                    break;
                 case R.id.navigation_worldscore:
-                    mTextMessage.setText(R.string.title_world_score);
-                    return true;
+                    selectedFragment=new WorldScoreFragment();
+                    break;
             }
-            return false;
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    selectedFragment).commit();
+            return true;
         }
     };
 
@@ -47,9 +52,14 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        //added this if statement to keep the selected fragment when rotating the device
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new MapFragment()).commit();
+        }
     }
 
     @Override

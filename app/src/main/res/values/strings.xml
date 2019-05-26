@@ -7,4 +7,7 @@
     <string name="app_bar_search">Search</string>
     <string name="app_bar_settings_title">Settings</string>
     <string name="btnExit_title">Exit</string>
+    <string name="btnSignIn">Sign in</string>
+    <string name="btnRegister">Register</string>
+    <string name="sign_in_text">Or you can sign in with:</string>
 </resources>

@@ -7,4 +7,9 @@
     <string name="app_bar_search">Search</string>
     <string name="app_bar_settings_title">Settings</string>
     <string name="btnExit_title">Exit</string>
+    <string name="FriendNameTitle">Name and surname</string>
+    <string name="FriendUsername">Username</string>
+    <string name="FriendPoints">Points</string>
+    <string name="exit_button_text">x</string>
+    <string name="profilPicDesription">Profile picture</string>
 </resources>

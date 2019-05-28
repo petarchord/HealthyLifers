@@ -2,7 +2,8 @@
 <resources>
     <color name="colorPrimary">#399eb5</color>
     <color name="colorPrimaryLight">#52bad1</color>
+    <color name="colorPrimaryLighter">#7DBAD1</color>
     <color name="colorPrimaryDark">#2c7d8f</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorPrimaryDark2">#303F9F</color>
+    <color name="colorStartScreen">#D6D6D6</color>
 </resources>

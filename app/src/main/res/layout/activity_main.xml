@@ -5,7 +5,8 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/colorStartScreen">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar"
@@ -25,6 +26,7 @@
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="5dp"
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintTop_toBottomOf="@+id/appBar"
         tools:layout_editor_absoluteX="8dp" />

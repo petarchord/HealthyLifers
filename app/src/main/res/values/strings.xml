@@ -12,4 +12,7 @@
     <string name="FriendPoints">Points</string>
     <string name="exit_button_text">x</string>
     <string name="profilPicDesription">Profile picture</string>
+    <string name="btnSignIn">Sign in</string>
+    <string name="btnRegister">Register</string>
+    <string name="sign_in_text">Or you can sign in with:</string>
 </resources>

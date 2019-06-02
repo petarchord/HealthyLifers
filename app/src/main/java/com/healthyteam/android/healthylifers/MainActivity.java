@@ -1,5 +1,6 @@
 package com.healthyteam.android.healthylifers;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -7,65 +8,87 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextMessage;
+    private Button signIn;
+    private Button register;
+    private Dialog signInWindow;
+    private Dialog registerWindow;
+    private ImageButton exitSignIn;
+    private ImageButton exitRegister;
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment selectedFragment = null;
-            switch (item.getItemId()) {
-                case R.id.navigation_map:
-                    selectedFragment=new MapFragment();
-                    break;
-                case R.id.navigation_myprofile:
-                    selectedFragment=new MyProfileFragment();
-                    break;
-                case R.id.navigation_myfriends:
-                    selectedFragment=new MyFriendsFragment();
-                    break;
-                case R.id.navigation_worldscore:
-                    selectedFragment=new WorldScoreFragment();
-                    break;
-            }
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    selectedFragment).commit();
-            return true;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sign_in);
 
-        //configure toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        signIn = (Button) findViewById(R.id.btnSignIn);
+        register = (Button) findViewById(R.id.btnRegister);
+        signInWindow = new Dialog(this);
+        signInWindow.setContentView(R.layout.customsignin);
+        registerWindow =new Dialog(this);
+        registerWindow.setContentView(R.layout.customregister);
+
+        exitSignIn = (ImageButton) signInWindow.findViewById(R.id.closeSignInForm);
+        exitRegister = (ImageButton) registerWindow.findViewById(R.id.closeRegisterForm);
 
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        signIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        //added this if statement to keep the selected fragment when rotating the device
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new MapFragment()).commit();
-        }
+                signInWindow.show();
+
+            }
+        });
+
+        register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                registerWindow.show();
+
+            }
+        });
+
+
+        exitSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                signInWindow.dismiss();
+            }
+        });
+
+
+        exitRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                registerWindow.dismiss();
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+
+
+
+
 }

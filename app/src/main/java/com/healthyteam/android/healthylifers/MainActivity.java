@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private Dialog logOutDialog;
     private Dialog settingsDialog;
     private ImageButton btnExit;
+    private Fragment settingsFragment = null;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+
         switch (item.getItemId())
         {
             case R.id.app_bar_search:
@@ -115,8 +117,18 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.app_bar_settings:
-                Fragment settingsFragment = new SettingsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,settingsFragment).commit();
+                if(settingsFragment == null)
+                {
+                    settingsFragment = new SettingsFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,settingsFragment).commit();
+
+                }
+                else
+                {
+                    getSupportFragmentManager().beginTransaction().hide(settingsFragment).commit();
+                    settingsFragment=null;
+                }
+
                 break;
 
 

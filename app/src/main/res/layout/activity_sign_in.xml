@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView android:layout_height="match_parent"
+android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,6 +13,8 @@
     tools:context=".SignInActivity">
 
 
+
+
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/healthy_image"
         android:layout_width="match_parent"
@@ -17,7 +22,7 @@
         android:layout_margin="16dp"
         android:src="@drawable/main_home1_770x350" />
 
-    <android.support.design.button.MaterialButton
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/btnSignIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,7 +37,7 @@
 
         />
 
-    <android.support.design.button.MaterialButton
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/btnRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,3 +90,5 @@
 
 
 </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="350dp"
-    android:layout_height="500dp"
-    android:layout_marginTop="90dp"
+    android:layout_width="310dp"
+    android:layout_height="520dp"
+    android:layout_marginTop="10dp"
     android:background="@drawable/signinwindow"
     android:layout_gravity="center">
 
@@ -186,6 +189,7 @@
             />
 
         <android.support.v7.widget.AppCompatEditText
+            android:inputType="textPassword"
             android:id="@+id/editTextPassRedgister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -220,6 +224,7 @@
             />
 
         <android.support.v7.widget.AppCompatEditText
+            android:inputType="textPassword"
             android:id="@+id/editTextPassRepeatRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -238,12 +243,14 @@
 
 
 
-    <android.support.design.button.MaterialButton
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/registerSubmit"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:text="Conitune"
         android:textColor="@color/colorSignInText"
         android:layout_marginTop="15dp"
+        android:layout_marginBottom="20dp"
         android:textAlignment="center"
         android:layout_gravity="center"
         android:background="@drawable/rounded_button"/>
@@ -251,3 +258,4 @@
 
 
 </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

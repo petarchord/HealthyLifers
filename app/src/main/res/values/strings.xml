@@ -10,6 +10,10 @@
     <string name="btnSignIn">Sign in</string>
     <string name="btnRegister">Register</string>
     <string name="sign_in_text">Or you can sign in with:</string>
+    <string name="log_out_text">Are you shure you want to log out?</string>
+    <string name="location_service">Location service</string>
+    <string name="app_guide">Appliaction guide</string>
+    <string name="blutetooth">Blutetooth</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

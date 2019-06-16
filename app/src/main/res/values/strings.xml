@@ -20,8 +20,16 @@
     <string name="SurnameTextMP">Surname:</string>
     <string name="ChangePassText">Change password</string>
     <string name="OK_text">Ok</string>
-    <string name="Cancel_text">Cancel</string>
+    <string name="Cancel_text">Cancle</string>
     <string name="textView_PlaceNeme">Place name</string>
     <string name="dateLabel">Added </string>
     <string name="CommentLabel">Comments</string>
+    <string name="log_out_text">Are you shure you want to log out?</string>
+    <string name="location_service">Location service</string>
+    <string name="app_guide">Appliaction guide</string>
+    <string name="blutetooth">Blutetooth</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+>>>>>>> ea4e21461a38af0c3cd4848638a6076554ed64c4
 </resources>

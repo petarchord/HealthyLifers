@@ -9,4 +9,5 @@
     <color name="colorSignIn">#D8D8D8</color>
     <color name="colorSignInButtons">#7FAADD</color>
     <color name="colorSignInText">#090808</color>
+    <color name="colorSignInBckgrnd">#AFD03A</color>
 </resources>

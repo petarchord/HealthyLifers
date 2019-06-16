@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView android:layout_height="match_parent"
+android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorSignIn"
@@ -9,16 +13,17 @@
     tools:context=".SignInActivity">
 
 
+
+
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/healthy_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-        android:layout_marginVertical="@dimen/activity_vertical_margin"
+        android:layout_margin="16dp"
         android:src="@drawable/main_home1_770x350" />
 
-    <android.support.design.button.MaterialButton
-        android:id="@+id/sign_in_button"
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btnSignIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
@@ -32,37 +37,57 @@
 
         />
 
-    <android.support.design.button.MaterialButton
-        android:id="@+id/register_button"
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btnRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="30dp"
-        android:text="@string/btnRegister"
         android:background="@drawable/rounded_button"
-        />
+        android:text="@string/btnRegister" />
+
 
     <android.support.v7.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="@string/sign_in_text"
         android:textAlignment="center"
-        android:textSize="18dp"
-        android:layout_marginTop="20dp"
         android:textColor="@color/colorSignInText"
-        />
+        android:textSize="18sp" />
 
-    <ImageButton
-        android:id="@+id/btnExit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/btnExit_title"
-        android:src="@drawable/icons8_google_80"
-        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/googleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="110dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/google"
+
+
+            />
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/appCompatImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:src="@drawable/facebook_box"
+
+
+            />
+
+
+    </LinearLayout>
 
 
 </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

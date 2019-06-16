@@ -16,7 +16,7 @@
         android:layout_marginTop="10dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/btnExit_title"
-        android:text="<<"
+        android:text="@string/btnExitTextFP"
         android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
         android:textSize="36sp" />
     <TextView

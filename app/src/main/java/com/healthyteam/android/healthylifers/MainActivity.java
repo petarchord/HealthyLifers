@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextMessage;
     private Dialog logOutDialog;
     private Dialog settingsDialog;
+    private Dialog addItemDialog;
     private ImageButton btnExit;
     private Fragment settingsFragment = null;
 

@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         btnExit = (ImageButton)findViewById(R.id.btnExit);
 
         settingsDialog = new Dialog(this);
+        settingsDialog.setContentView(R.layout.dialog_settings);
 
         logOutDialog = new Dialog(this);
         logOutDialog.setContentView(R.layout.dialog_log_out);
@@ -114,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.app_bar_settings:
+                Fragment settingsFragment = new SettingsFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,settingsFragment).commit();
                 break;
 
 

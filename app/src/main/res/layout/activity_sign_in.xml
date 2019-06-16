@@ -60,7 +60,7 @@
         android:layout_gravity="center"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/btnExit_title"
-        android:src="@drawable/icons8-google-80"
+        android:src="@drawable/icons8_google_80"
         />
 
 

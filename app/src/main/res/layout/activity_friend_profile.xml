@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray">
+
+    <Button
+        android:id="@+id/btnExitFP"
+        android:layout_width="56dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/btnExit_title"
+        android:text="<<"
+        android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+        android:textSize="36sp" />
+    <TextView
+        android:id="@+id/TextView_FriendNameSurnameFP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnExitFP"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/FriendNameTitle"
+        android:textColor="@color/colorPrimary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+        />
+    <TextView
+        android:id="@+id/TextView_FriendUsernameFP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TextView_FriendNameSurnameFP"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/FriendUsername"
+        android:textColor="@color/colorPrimary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+        />
+
+    <TextView
+        android:id="@+id/TextView_FiendUsernameLabelFP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TextView_FriendUsernameFP"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp"
+        android:text="@string/FriendUsername"
+        android:textColor="@android:color/secondary_text_light"
+
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/TextView_FriendPointsFP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TextView_FriendUsernameFP"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/FriendPoints"
+        android:textColor="@color/colorPrimary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+        />
+
+    <TextView
+        android:id="@+id/TextView_FriendPointsLabelFP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TextView_FriendPointsFP"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp"
+        android:text="@string/FriendPoints"
+        android:textColor="@android:color/secondary_text_light"
+
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/imageView_ProfilePicFP"
+        android:layout_width="180dp"
+        android:layout_height="169dp"
+        android:layout_alignBottom="@+id/TextView_FriendPointsLabelFP"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="2dp"
+        android:layout_toEndOf="@+id/TextView_FriendNameSurnameFP"
+        android:layout_toRightOf="@+id/TextView_FriendNameSurnameFP"
+        android:contentDescription="@string/profilPicDesription"
+        tools:srcCompat="@tools:sample/avatars" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/TextView_FriendPointsLabelFP"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            android:text="Posts:"/>
+        <ListView
+            android:id="@+id/ListView_PostFP"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
+    </LinearLayout>
+
+</RelativeLayout>

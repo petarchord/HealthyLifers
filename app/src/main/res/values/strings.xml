@@ -15,4 +15,13 @@
     <string name="btnSignIn">Sign in</string>
     <string name="btnRegister">Register</string>
     <string name="sign_in_text">Or you can sign in with:</string>
+    <string name="btnEditMP_text">Edit</string>
+    <string name="NameTextMP">Name:</string>
+    <string name="SurnameTextMP">Surname:</string>
+    <string name="ChangePassText">Change password</string>
+    <string name="OK_text">Ok</string>
+    <string name="Cancel_text">Cancel</string>
+    <string name="textView_PlaceNeme">Place name</string>
+    <string name="dateLabel">Added </string>
+    <string name="CommentLabel">Comments</string>
 </resources>

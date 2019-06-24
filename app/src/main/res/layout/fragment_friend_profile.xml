@@ -10,13 +10,13 @@
         android:id="@+id/btnExitFP"
         android:layout_width="56dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:layout_gravity="start"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/btnExit_title"
-        android:text="<<"
+        android:text="@string/btnExitTextFP"
         android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
         android:textSize="36sp" />
     <TextView

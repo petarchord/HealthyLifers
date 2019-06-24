@@ -31,5 +31,6 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
->>>>>>> ea4e21461a38af0c3cd4848638a6076554ed64c4
+    <string name="btnExitTextFP"><![CDATA[<<]]></string>
+    >>>>>>> ea4e21461a38af0c3cd4848638a6076554ed64c4
 </resources>

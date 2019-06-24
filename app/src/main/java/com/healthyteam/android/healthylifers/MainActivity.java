@@ -17,15 +17,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
+import com.healthyteam.android.healthylifers.Domain.DomainController;
+
 //ctrl + o = open event handlers menu
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextMessage;
     private Dialog logOutDialog;
     private Dialog settingsDialog;
     private ImageButton btnExit;
     private Fragment settingsFragment = null;
+    BottomNavigationView navigation;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -35,16 +37,16 @@ public class MainActivity extends AppCompatActivity {
             Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_map:
-                    selectedFragment=new MapFragment();
+                    selectedFragment=MapFragment.getInstance();
                     break;
                 case R.id.navigation_myprofile:
-                    selectedFragment=new MyProfileFragment();
+                    selectedFragment=MyProfileFragment.getInstance();
                     break;
                 case R.id.navigation_myfriends:
-                    selectedFragment=new MyFriendsFragment();
+                    selectedFragment=MyFriendsFragment.getInstance();
                     break;
                 case R.id.navigation_worldscore:
-                    selectedFragment=new WorldScoreFragment();
+                    selectedFragment=WorldScoreFragment.getInstance();
                     break;
             }
 
@@ -58,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //should call from SignIn Activity
+        DomainController.setUser("u","p");
         //configure toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         btnExit = (ImageButton)findViewById(R.id.btnExit);
-
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
         settingsDialog = new Dialog(this);
+
         settingsDialog.setContentView(R.layout.dialog_settings);
 
         logOutDialog = new Dialog(this);
@@ -80,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
                 logOutDialog.show();
             }
         });
-
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         //added this if statement to keep the selected fragment when rotating the device
@@ -90,11 +92,6 @@ public class MainActivity extends AppCompatActivity {
                     new MapFragment()).commit();
         }
     }
-
-
-
-
-
 
 
 

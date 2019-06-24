@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="300dp"
+    android:layout_height="250dp"
+    android:layout_gravity="center"
+    android:background="@drawable/log_out_window"
+    >
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:text="@string/delete_friend_text"
+        android:textSize="25dp" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        >
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_yesDDF"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/button_main"
+            android:text="@string/yes_text"
+
+            />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_noDDF"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/button_main"
+            android:text="@string/no_text"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

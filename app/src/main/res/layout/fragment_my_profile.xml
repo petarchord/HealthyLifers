@@ -35,12 +35,18 @@
             android:text="@string/FriendNameTitle"
             />
         <TextView
-            android:id="@+id/textView_UsernameMP"
+        android:id="@+id/textView_UsernameMP"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="50dp"
+        android:text="@string/FriendUsername"/>
+        <TextView
+            android:id="@+id/textView_UsernameLabelMP"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="50dp"
+            android:textColor="@android:color/darker_gray"
             android:text="@string/FriendUsername"/>
         <TextView
             android:id="@+id/textView_PointsMP"
@@ -49,6 +55,12 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@android:color/white"
             android:layout_marginTop="50dp"
+            android:text="@string/FriendPoints"/>
+        <TextView
+            android:id="@+id/textView_PointsLabelMP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
             android:text="@string/FriendPoints"/>
 
         <Button
@@ -64,6 +76,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/LinearLayout_EditUserInfo"
         android:layout_below="@id/imageView_ProfilePicMP"
         android:layout_marginTop="60dp"
@@ -73,7 +86,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
 
-        android:descendantFocusability="blocksDescendants"
+
         >
 
         <TextView
@@ -84,11 +97,13 @@
         android:textColor="@android:color/white" />
 
         <EditText
+            android:inputType="text"
             android:id="@+id/EditText_NameMP"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@android:color/white"
+
             />
 
         <TextView
@@ -105,20 +120,23 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@android:color/white"
+            android:clickable="true"
+            android:focusable="true"
             />
 
         <TextView
             android:id="@+id/textView_changePassMP"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginLeft="100dp"
+            android:layout_marginStart="120dp"
+            android:layout_marginLeft="120dp"
             android:layout_marginTop="10dp"
             android:clickable="true"
             android:text="@string/ChangePassText"
             android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
             android:textColor="@android:color/white"
             android:textStyle="italic" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -149,6 +167,6 @@
                 android:textColor="@color/colorPrimaryLighter"
 
                 />
-            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

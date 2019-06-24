@@ -9,27 +9,41 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.healthyteam.android.healthylifers.Domain.UserTest;
+import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.User;
+
+import java.util.List;
 
 public class WorldScoreFragment extends Fragment {
+    private View layout_fragment;
+    private ListView listWorldScore;
+
+    private static WorldScoreFragment instance;
+
+    public static WorldScoreFragment getInstance(){
+        if(instance==null)
+            instance=new WorldScoreFragment();
+        return instance;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_world_score,container,false);
-        ListView list = (ListView) view.findViewById(R.id.ListView_worldScore);
+        layout_fragment = inflater.inflate(R.layout.fragment_world_score,container,false);
+        listWorldScore = (ListView) layout_fragment.findViewById(R.id.ListView_worldScore);
         WorldScoreAdapter adapter = new WorldScoreAdapter();
-        list.setAdapter(adapter);
+        listWorldScore.setAdapter(adapter);
 
-        return view;
+        return layout_fragment;
     }
 
     public class WorldScoreAdapter extends BaseAdapter {
         @Override
         public int getCount() {
             //all user count
-            return UserTest.getInstance().getFriendList().size();
+            return DomainController.getUser().getFriendList().size();
         }
 
         @Override
@@ -51,11 +65,11 @@ public class WorldScoreFragment extends Fragment {
             TextView txtPoints = (TextView) view.findViewById(R.id.textView_PointsScore);
 
             //get user from database
-            UserTest friend = UserTest.getInstance().getFriendList().get(i);
+            User friend = DomainController.getUser().getFriendList().get(i);
             String NameSurname = friend.getName() + " " + friend.getSurname();
             txtName.setText(NameSurname);
             txtUsername.setText(friend.getUsername());
-            txtPoints.setText(friend.getPoints().toString());
+            txtPoints.setText(friend.getPointsStirng());
 
 
             return view;

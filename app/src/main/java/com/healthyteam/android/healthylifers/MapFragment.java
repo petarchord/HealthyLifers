@@ -10,6 +10,13 @@ import android.view.ViewGroup;
 
 public class MapFragment extends Fragment {
 
+    private static MapFragment instance;
+
+    public static MapFragment getInstance(){
+        if(instance==null)
+            instance=new MapFragment();
+        return instance;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

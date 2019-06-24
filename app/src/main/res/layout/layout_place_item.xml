@@ -24,12 +24,11 @@
         android:id="@+id/textView_PlaceNamePI"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="20dp"
-
-        android:layout_marginLeft="20dp"
-        android:layout_toEndOf="@+id/imageView_ProfilePic"
-        android:layout_toRightOf="@+id/imageView_ProfilePic"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_toEndOf="@+id/imageView_PlacePicPI"
+        android:layout_toRightOf="@+id/imageView_PlacePicPI"
         android:text="@string/textView_PlaceNeme"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@android:color/white" />
@@ -49,21 +48,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imageView_PlacePicPI"
-        android:layout_marginStart="60dp"
-        android:layout_marginLeft="60dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
         android:layout_toEndOf="@+id/textView_DatePI"
         android:layout_toRightOf="@+id/textView_DatePI"
         android:text="@string/CommentLabel"
         android:textColor="@android:color/white" />
+
     <ImageView
         android:id="@+id/imageView_LikePicFI"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imageView_PlacePicPI"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
         android:layout_toEndOf="@+id/TextView_commentFI"
         android:layout_toRightOf="@+id/TextView_commentFI"
-        android:layout_marginLeft="50dp"
-        android:layout_marginStart="50dp"
         app:srcCompat="@drawable/baseline_thumb_up_24" />
 
     <TextView
@@ -71,11 +71,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imageView_PlacePicPI"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:layout_toEndOf="@+id/imageView_LikePicFI"
         android:layout_toRightOf="@+id/imageView_LikePicFI"
-        android:layout_marginTop="5dp"
+
         android:textSize="12sp" />
 
     <ImageView
@@ -85,8 +86,8 @@
         android:layout_below="@+id/imageView_PlacePicPI"
         android:layout_toEndOf="@+id/TextView_likeNumFI"
         android:layout_toRightOf="@+id/TextView_likeNumFI"
-        android:layout_marginLeft="30dp"
-        android:layout_marginStart="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         app:srcCompat="@drawable/baseline_thumb_down_24" />
 
     <TextView
@@ -94,11 +95,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imageView_PlacePicPI"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:layout_toEndOf="@+id/imageView_dislikePicFI"
         android:layout_toRightOf="@+id/imageView_dislikePicFI"
-        android:layout_marginTop="5dp"
         android:textSize="12sp" />
 
 </RelativeLayout>

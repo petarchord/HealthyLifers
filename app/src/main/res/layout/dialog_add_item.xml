@@ -115,7 +115,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:scaleType="center"
-            android:src="@drawable/icons8-empty-flag-52"/>
+            android:src="@drawable/icons8_empty_flag_52"/>
 
 
 

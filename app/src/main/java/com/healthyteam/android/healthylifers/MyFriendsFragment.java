@@ -1,6 +1,5 @@
 package com.healthyteam.android.healthylifers;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -25,6 +24,9 @@ public class MyFriendsFragment extends Fragment {
     private View fragment_layout;
     private ListView lvFriends;
     private FloatingActionButton fabAddFriend;
+    private Dialog addFriendDialog;
+    private Button dialogBtnOk;
+    private Button dialogBtnCancel;
     private Dialog deleteFriendDialog;
     private Button dialogBtnYes;
     private Button dialogBtnNo;
@@ -44,17 +46,39 @@ public class MyFriendsFragment extends Fragment {
         fragment_layout = inflater.inflate(R.layout.fragment_my_friends,container,false);
         lvFriends = fragment_layout.findViewById(R.id.ListView_Friends);
         fabAddFriend = fragment_layout.findViewById(R.id.floatingActionButton_addFriend);
-        //TODO: need to fix dialog box to be modal and to work properly
         deleteFriendDialog = new Dialog(getContext());
         deleteFriendDialog.setContentView(R.layout.dialog_delete_friend);
         deleteFriendDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialogBtnYes=deleteFriendDialog.findViewById(R.id.button_yesDDF);
-        dialogBtnNo=deleteFriendDialog.findViewById(R.id.button_noDDF);
+        dialogBtnYes=deleteFriendDialog.findViewById(R.id.button_oksDAF);
+        dialogBtnNo=deleteFriendDialog.findViewById(R.id.button_cancelDAF);
+        addFriendDialog= new Dialog(getContext());
+        addFriendDialog.setContentView(R.layout.dialog_add_friend);
+        addFriendDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBtnOk = addFriendDialog.findViewById(R.id.button_okDAF);
+        dialogBtnCancel=addFriendDialog.findViewById(R.id.button_cancelDAF);
 
         dialogBtnNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 deleteFriendDialog.cancel();
+            }
+        });
+        fabAddFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFriendDialog.show();
+            }
+        });
+        dialogBtnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFriendDialog.cancel();
+            }
+        });
+        dialogBtnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFriendDialog.cancel();
             }
         });
         adapter = new MyFriendAdapter();
@@ -122,6 +146,32 @@ public class MyFriendsFragment extends Fragment {
                 }});
             //need to add image set
             //imageProfile.setimag;
+
+            return view;
+        }
+    }
+    //TODO: set Bluetooth items adapter
+    public class BluetoothItemsAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            //get count from some android service
+            return 0;
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            //init bluetooth name and set onClick Listeners
 
             return view;
         }

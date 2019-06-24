@@ -33,7 +33,8 @@
     <string name="add_image">Add image</string>
     <string name="leftpar">(</string>
     <string name="rightpar">)</string>
-    <string name="btnExitTextFP"><![CDATA[<<]]></string>
+    <string name="btnExitTextFP">\b\b</string>
     <string name="delete_friend_text">Are you sure you want to delete your friend?</string>
-    <string name="btnExitTextFP"><![CDATA[<<]]></string>
+    <string name="hello_blank_fragment" />
+    <string name="addFriend_label">Add friend</string>
 </resources>

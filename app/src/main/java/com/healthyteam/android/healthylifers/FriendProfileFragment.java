@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +12,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.Location;
 import com.healthyteam.android.healthylifers.Domain.User;
 
@@ -29,7 +25,7 @@ public class FriendProfileFragment extends Fragment {
     private TextView txtFriendPoints;
     private ImageView imgFriendPic;
     private ListView lvPosts;
-    private Button btnExit;
+    private ImageButton btnExit;
 
     public void setFriend(User u){
         this.friend=u;

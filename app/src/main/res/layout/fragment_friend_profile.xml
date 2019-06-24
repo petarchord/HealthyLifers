@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/darker_gray">
 
-    <Button
+    <ImageButton
         android:id="@+id/btnExitFP"
         android:layout_width="56dp"
         android:layout_height="wrap_content"
@@ -14,9 +14,9 @@
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
+        android:src="@drawable/baseline_arrow_back_ios_black_24"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/btnExit_title"
-        android:text="@string/btnExitTextFP"
         android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
         android:textSize="36sp" />
     <TextView
@@ -99,7 +99,7 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/TextView_FriendPointsLabelFP"
         android:layout_marginTop="20dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorPrimaryLight"
         android:orientation="vertical"
         >
 

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="350dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+   android:background="@drawable/log_out_window"
+    >
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:text="@string/addFriend_label"
+        android:textSize="25dp" />
+
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="450dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@android:color/darker_gray">
+        <ListView
+            android:id="@+id/ListView_BluetoothItems"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:headerDividersEnabled="true"
+            android:background="@android:color/white"
+            >
+        </ListView>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        >
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_okDAF"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginLeft="50dp"
+
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/button_main"
+            android:text="@string/OK_text"
+
+            />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_cancelDAF"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="30dp"
+            android:background="@drawable/button_main"
+            android:text="@string/Cancel_text"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

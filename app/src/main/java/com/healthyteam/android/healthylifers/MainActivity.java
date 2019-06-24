@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Dialog logOutDialog;
     private Dialog settingsDialog;
+    private Dialog addItemDialog;
     private ImageButton btnExit;
     private Fragment settingsFragment = null;
     BottomNavigationView navigation;

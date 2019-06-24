@@ -28,13 +28,12 @@
     <string name="CommentLabel">Comments</string>
     <string name="log_out_text">Are you sure you want to log out?</string>
     <string name="location_service">Location service</string>
-    <string name="app_guide">Application guide</string>
-    <string name="blutetooth">Bluetooth</string>
+    <string name="app_guide">Appliaction guide</string>
+    <string name="blutetooth">Blutetooth</string>
+    <string name="add_image">Add image</string>
     <string name="leftpar">(</string>
     <string name="rightpar">)</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="btnExitTextFP"><![CDATA[<<]]></string>
     <string name="delete_friend_text">Are you sure you want to delete your friend?</string>
-    >>>>>>> ea4e21461a38af0c3cd4848638a6076554ed64c4
+    <string name="btnExitTextFP"><![CDATA[<<]]></string>
 </resources>

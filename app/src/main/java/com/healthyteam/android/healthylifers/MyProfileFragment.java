@@ -1,6 +1,10 @@
 package com.healthyteam.android.healthylifers;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,6 +38,13 @@ public class MyProfileFragment extends Fragment {
     TextView txtChangePass;
     Button btnOk;
     Button btnCancel;
+    Dialog dialogChangePass;
+    Button dialogBtnOk;
+    Button dialogBtnCancel;
+    EditText etxtDialogOldPass;
+    EditText etxtDialogNewPass;
+    EditText etxtDialogConfirmPass;
+    TextView dialogTxtError;
     private static MyProfileFragment instance;
 
     public static MyProfileFragment getInstance(){
@@ -52,6 +63,7 @@ public class MyProfileFragment extends Fragment {
         txtNameSurname = (TextView)fragment_layout.findViewById(R.id.textView_NameSurnameMP);
         txtUsername = (TextView)fragment_layout.findViewById(R.id.textView_UsernameMP);
         txtPoints = (TextView)fragment_layout.findViewById(R.id.textView_PointsMP);
+        //TODO: set Text View for pass change to be like hyperlink
         txtChangePass = (TextView)fragment_layout.findViewById(R.id.textView_changePassMP);
         btnEdit = (Button)fragment_layout.findViewById(R.id.button_EditMP);
         btnOk = (Button)fragment_layout.findViewById(R.id.button_OkMP);
@@ -60,16 +72,49 @@ public class MyProfileFragment extends Fragment {
         etxtEditSurname= (EditText)fragment_layout.findViewById(R.id.EditText_SurnameMP);
         layout_info = (LinearLayout) fragment_layout.findViewById(R.id.LinearLayout_UserInfo);
         layout_edit = (LinearLayout) fragment_layout.findViewById(R.id.LinearLayout_EditUserInfo);
+        dialogChangePass= new Dialog(getContext());
+        dialogChangePass.setContentView(R.layout.dialog_change_password);
+        dialogChangePass.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBtnOk=dialogChangePass.findViewById(R.id.button_okDCP);
+        dialogBtnCancel=dialogChangePass.findViewById(R.id.button_cancelDCP);
+        dialogTxtError=dialogChangePass.findViewById(R.id.TextView_ErrorDCP);
+        etxtDialogOldPass=dialogChangePass.findViewById(R.id.EditText_oldPassDCP);
+        etxtDialogNewPass=dialogChangePass.findViewById(R.id.EditText_newPassDCP);
+        etxtDialogConfirmPass=dialogChangePass.findViewById(R.id.EditText_confirmPassDCP);
 
 
-
-        //layout_Info.setVisibility(View.VISIBLE);
         layout_edit.setVisibility(View.GONE);
         btnEdit.setOnClickListener(new EditBtnListener());
         btnCancel.setOnClickListener(new CancleBtnListener());
         btnOk.setOnClickListener(new OkBtnListener());
         txtChangePass.setOnClickListener(new LtxtListener());
+        //TODO: clear EditText in onCancle listaner
+        dialogChangePass.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                dialogTxtError.setVisibility(View.GONE);
 
+            }
+        });
+        dialogBtnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //check old pass
+                if(!etxtDialogNewPass.getText().equals(etxtDialogConfirmPass.getText())){
+                    dialogTxtError.setText(getString(R.string.passError_matchPass));
+                    dialogTxtError.setVisibility(View.VISIBLE);
+                }
+                //update database
+                dialogChangePass.cancel();
+            }
+        });
+        dialogBtnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogTxtError.setVisibility(View.GONE);
+                dialogChangePass.cancel();
+            }
+        });
         String NameSurname= DomainController.getUser().getName() + " " + DomainController.getUser().getSurname();
         txtNameSurname.setText(NameSurname);
         txtUsername.setText(DomainController.getUser().getUsername());
@@ -83,7 +128,6 @@ public class MyProfileFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Context context = getContext();
             etxtEditName.setText(DomainController.getUser().getName());
             etxtEditSurname.setText(DomainController.getUser().getSurname());
 
@@ -124,8 +168,7 @@ public class MyProfileFragment extends Fragment {
     class LtxtListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-
-            //otvori dialog box
+            dialogChangePass.show();
         }
 
     }

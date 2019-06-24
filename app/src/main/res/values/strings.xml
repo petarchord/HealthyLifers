@@ -37,4 +37,7 @@
     <string name="delete_friend_text">Are you sure you want to delete your friend?</string>
     <string name="hello_blank_fragment" />
     <string name="addFriend_label">Add friend</string>
+    <string name="changePass_text">Change Password</string>
+    <string name="passError_oldPass">*Your old password appears to be incorrect</string>
+    <string name="passError_matchPass">*Passwords need to match</string>
 </resources>

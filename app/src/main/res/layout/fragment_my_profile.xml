@@ -24,7 +24,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:descendantFocusability="blocksDescendants"
         >
         <TextView
             android:id="@+id/textView_NameSurnameMP"
@@ -76,7 +75,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:visibility="gone"
         android:id="@+id/LinearLayout_EditUserInfo"
         android:layout_below="@id/imageView_ProfilePicMP"
         android:layout_marginTop="60dp"
@@ -131,11 +129,10 @@
             android:layout_marginStart="120dp"
             android:layout_marginLeft="120dp"
             android:layout_marginTop="10dp"
-            android:clickable="true"
             android:text="@string/ChangePassText"
             android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
             android:textColor="@android:color/white"
-            android:textStyle="italic" />
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"

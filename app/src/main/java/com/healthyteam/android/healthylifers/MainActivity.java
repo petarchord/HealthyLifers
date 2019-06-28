@@ -19,6 +19,8 @@ import android.support.v4.app.Fragment;
 
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 
+import org.osmdroid.config.Configuration;
+
 //ctrl + o = open event handlers menu
 
 public class MainActivity extends AppCompatActivity {
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-
         btnExit = (ImageButton)findViewById(R.id.btnExit);
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         settingsDialog = new Dialog(this);
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         //added this if statement to keep the selected fragment when rotating the device
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new MapFragment()).commit();
+                    MapFragment.getInstance()).commit();
         }
     }
 

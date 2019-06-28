@@ -88,21 +88,27 @@ public class MyProfileFragment extends Fragment {
         btnCancel.setOnClickListener(new CancleBtnListener());
         btnOk.setOnClickListener(new OkBtnListener());
         txtChangePass.setOnClickListener(new LtxtListener());
-        //TODO: clear EditText in onCancle listaner
         dialogChangePass.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
                 dialogTxtError.setVisibility(View.GONE);
+                etxtDialogConfirmPass.getText().clear();
+                etxtDialogNewPass.getText().clear();
+                etxtDialogOldPass.getText().clear();
 
             }
         });
         dialogBtnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String newPass= etxtDialogNewPass.getText().toString();
+                String confirmPass= etxtDialogConfirmPass.getText().toString();
                 //check old pass
-                if(!etxtDialogNewPass.getText().equals(etxtDialogConfirmPass.getText())){
+
+                if(!newPass.equals(confirmPass)){
                     dialogTxtError.setText(getString(R.string.passError_matchPass));
                     dialogTxtError.setVisibility(View.VISIBLE);
+                    return;
                 }
                 //update database
                 dialogChangePass.cancel();
@@ -111,7 +117,6 @@ public class MyProfileFragment extends Fragment {
         dialogBtnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogTxtError.setVisibility(View.GONE);
                 dialogChangePass.cancel();
             }
         });

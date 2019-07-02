@@ -61,9 +61,6 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 
 public class MapFragment extends Fragment {
     private  static final String TAG = "Location Service: ";

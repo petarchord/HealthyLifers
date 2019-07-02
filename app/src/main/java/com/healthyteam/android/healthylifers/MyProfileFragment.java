@@ -82,7 +82,6 @@ public class MyProfileFragment extends Fragment {
         etxtDialogNewPass=dialogChangePass.findViewById(R.id.EditText_newPassDCP);
         etxtDialogConfirmPass=dialogChangePass.findViewById(R.id.EditText_confirmPassDCP);
 
-
         layout_edit.setVisibility(View.GONE);
         btnEdit.setOnClickListener(new EditBtnListener());
         btnCancel.setOnClickListener(new CancleBtnListener());

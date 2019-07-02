@@ -19,8 +19,6 @@ import android.support.v4.app.Fragment;
 
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 
-import org.osmdroid.config.Configuration;
-
 //ctrl + o = open event handlers menu
 
 public class MainActivity extends AppCompatActivity {

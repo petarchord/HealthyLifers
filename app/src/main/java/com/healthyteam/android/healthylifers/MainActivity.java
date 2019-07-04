@@ -7,6 +7,7 @@ import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,8 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private Dialog logOutDialog;
     private Dialog settingsDialog;
     private Dialog addItemDialog;
+    private Dialog locationViewDialog;
     private ImageButton btnExit;
     private Fragment settingsFragment = null;
+    private SectionsPageAdapter mSectionPageAdapter;
+
     BottomNavigationView navigation;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -73,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
         addItemDialog = new Dialog(this);
         addItemDialog.setContentView(R.layout.dialog_add_item);
 
+        locationViewDialog = new Dialog(this);
+        locationViewDialog.setContentView(R.layout.dialog_location_view);
+
         btnExit = (ImageButton)findViewById(R.id.btnExit);
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         settingsDialog = new Dialog(this);
@@ -98,6 +105,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setUpViewPager(ViewPager viewPager)
+    {
+        SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
+        adapter.addFragment(new TabInfoFragment(),"TabInfoFragment");
+        adapter.addFragment(new TabCommentsFragment(),"TabCommentsFragment");
+        viewPager.setAdapter(adapter);
+    }
+
 
 
     @Override
@@ -115,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
         {
             case R.id.app_bar_search:
                 Log.d("MyTag","Search clicked!");
-                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                addItemDialog.show();
+                locationViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                locationViewDialog.show();
 
                 break;
 

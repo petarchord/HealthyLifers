@@ -70,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        addItemDialog = new Dialog(this);
+        addItemDialog.setContentView(R.layout.dialog_add_item);
+
         btnExit = (ImageButton)findViewById(R.id.btnExit);
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         settingsDialog = new Dialog(this);
@@ -112,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
         {
             case R.id.app_bar_search:
                 Log.d("MyTag","Search clicked!");
+                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                addItemDialog.show();
 
                 break;
 

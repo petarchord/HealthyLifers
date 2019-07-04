@@ -3,12 +3,15 @@ package com.healthyteam.android.healthylifers;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -77,6 +80,7 @@ public class MapFragment extends Fragment {
     private IMapController mapController=null;
     private LocationManager locationManager;
     MyLocationNewOverlay myLocationOverlay;
+    private Dialog addItemDialog;
 
     // bunch of location related apis
     private FusedLocationProviderClient mFusedLocationClient;
@@ -102,14 +106,20 @@ public class MapFragment extends Fragment {
         setLocationSettings();
         setAddLocationListener();
 
+        addItemDialog = new Dialog(getContext());
+        addItemDialog.setContentView(R.layout.dialog_add_item);
+
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(addPlace){
+             /*   if(addPlace){
                     pickLocationOptionOff();
                     return;
                 }
-                pickLocationOptionOn();
+                pickLocationOptionOn(); */
+                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                addItemDialog.show();
+
             }
         });
         return layour_fragment;

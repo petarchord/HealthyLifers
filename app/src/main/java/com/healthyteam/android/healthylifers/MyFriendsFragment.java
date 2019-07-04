@@ -115,6 +115,7 @@ public class MyFriendsFragment extends Fragment {
             Button btnDelete= view.findViewById(R.id.button_deleteFriend);
             ImageView imageProfile = (ImageView) view.findViewById(R.id.imageView_ProfilePic);
 
+            imageProfile.setImageResource(R.drawable.profile_picture);
             final User friend = DomainController.getUser().getFriendList().get(i);
             String NameSurname = friend.getName() + " " + friend.getSurname();
             txtName.setText(NameSurname);

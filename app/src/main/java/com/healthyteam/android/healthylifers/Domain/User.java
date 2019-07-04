@@ -14,6 +14,7 @@ public class User {
 
     //u konacnoj imp dodati jos email, lan, lon
     public User(String name, String surname, String username, Integer points) {
+        data = new UserData();
         data.Name = name;
         data.Surname = surname;
         data.Username = username;
@@ -54,7 +55,9 @@ public class User {
         }
         return friendList;
     }
-
+    public String getUID(){
+       return data.UID;
+    }
     public String getUsername(){
         return data.Username;
     }
@@ -71,7 +74,12 @@ public class User {
     }
 
     //endregion
+    //region Test
+    public void setUID(String uid){
+        data.UID=uid;
+    }
 
+    //endregion
     //region Setter
     public void setName(String name) {
         data.Name = name;
@@ -100,6 +108,9 @@ public class User {
     public void setFriendList(List<User> friendList) {
         this.friendList = friendList;
     }
+    public void setData(UserData data){
+        this.data=data;
+    }
     //endregion
 
     //region Methods
@@ -107,8 +118,10 @@ public class User {
         //delete from database
         getFriendList().remove(friend);
     }
-    public void setData(UserData data){
-        this.data=data;
+
+    public void Update(){
+        data.Update();
     }
+
     //endregion
 }

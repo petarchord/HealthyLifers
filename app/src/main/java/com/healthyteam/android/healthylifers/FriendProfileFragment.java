@@ -41,6 +41,7 @@ public class FriendProfileFragment extends Fragment {
         btnExit=fragment_layout.findViewById(R.id.btnExitFP);
         lvPosts = (ListView) fragment_layout.findViewById(R.id.ListView_PostFP);
 
+        imgFriendPic.setImageResource(R.drawable.profile_picture);
         String NameSurname= friend.getName() + " " + friend.getSurname();
         txtFriendNameSurname.setText(NameSurname);
         txtFriendUsername.setText(friend.getUsername());
@@ -90,6 +91,7 @@ public class FriendProfileFragment extends Fragment {
 
 
             //set picture
+            imageProfile.setImageResource(R.drawable.location_clipart);
             txtPlaceName.setText(currlocation.getName());
             String dateString = getString(R.string.dateLabel)+" "+currlocation.getDateAdded();
             txtDate.setText(dateString);

@@ -3,8 +3,10 @@ package com.healthyteam.android.healthylifers;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,6 +26,8 @@ import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.User;
 
 import org.w3c.dom.Text;
+
+import static android.app.Activity.RESULT_OK;
 
 public class MyProfileFragment extends Fragment {
     View fragment_layout;
@@ -38,6 +43,8 @@ public class MyProfileFragment extends Fragment {
     TextView txtChangePass;
     Button btnOk;
     Button btnCancel;
+    ImageButton btnTakePic;
+    ImageButton btnChoosePic;
     Dialog dialogChangePass;
     Button dialogBtnOk;
     Button dialogBtnCancel;
@@ -45,8 +52,10 @@ public class MyProfileFragment extends Fragment {
     EditText etxtDialogNewPass;
     EditText etxtDialogConfirmPass;
     TextView dialogTxtError;
+    Uri mImageUri;
     private static MyProfileFragment instance;
 
+    private static final int PICK_IMAGE_REQUEST = 1;
     public static MyProfileFragment getInstance(){
         if(instance==null)
             instance=new MyProfileFragment();
@@ -63,10 +72,13 @@ public class MyProfileFragment extends Fragment {
         txtNameSurname = (TextView)fragment_layout.findViewById(R.id.textView_NameSurnameMP);
         txtUsername = (TextView)fragment_layout.findViewById(R.id.textView_UsernameMP);
         txtPoints = (TextView)fragment_layout.findViewById(R.id.textView_PointsMP);
+        ProfilePic = fragment_layout.findViewById(R.id.imageView_ProfilePicMP);
         //TODO: set Text View for pass change to be like hyperlink
         txtChangePass = (TextView)fragment_layout.findViewById(R.id.textView_changePassMP);
         btnEdit = (Button)fragment_layout.findViewById(R.id.button_EditMP);
         btnOk = (Button)fragment_layout.findViewById(R.id.button_OkMP);
+        btnTakePic = fragment_layout.findViewById(R.id.button_TakePicMP);
+        btnChoosePic = fragment_layout.findViewById(R.id.button_ChoosePicMP);
         btnCancel = (Button)fragment_layout.findViewById(R.id.button_CancelMP);
         etxtEditName = (EditText)fragment_layout.findViewById(R.id.EditText_NameMP);
         etxtEditSurname= (EditText)fragment_layout.findViewById(R.id.EditText_SurnameMP);
@@ -97,6 +109,7 @@ public class MyProfileFragment extends Fragment {
 
             }
         });
+
         dialogBtnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,6 +126,12 @@ public class MyProfileFragment extends Fragment {
                 dialogChangePass.cancel();
             }
         });
+        btnChoosePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFileChooser();
+            }
+        });
         dialogBtnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,8 +142,26 @@ public class MyProfileFragment extends Fragment {
         txtNameSurname.setText(NameSurname);
         txtUsername.setText(DomainController.getUser().getUsername());
         txtPoints.setText(DomainController.getUser().getPointsStirng());
+        ProfilePic.setImageResource(R.drawable.profile_picture);
 
         return fragment_layout;
+    }
+    void openFileChooser(){
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent,PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            mImageUri = data.getData();
+
+            ProfilePic.setImageURI(mImageUri);
+
+        }
     }
 
     class EditBtnListener implements View.OnClickListener {

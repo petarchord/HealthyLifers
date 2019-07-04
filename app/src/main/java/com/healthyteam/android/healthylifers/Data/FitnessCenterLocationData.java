@@ -1,4 +1,5 @@
 package com.healthyteam.android.healthylifers.Data;
 
-public class FitnessCenterLocationData {
+public class FitnessCenterLocationData extends LocationModel{
+    public FitnessCenterLocationData(){}
 }

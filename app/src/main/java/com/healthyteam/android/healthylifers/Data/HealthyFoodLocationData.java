@@ -1,4 +1,4 @@
 package com.healthyteam.android.healthylifers.Data;
 
-public class HealthyFoodLocationData {
+public class HealthyFoodLocationData extends LocationModel {
 }

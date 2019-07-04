@@ -1,8 +1,12 @@
 package com.healthyteam.android.healthylifers.Data;
 
 import android.content.res.Configuration;
+import android.renderscript.RenderScript;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -11,11 +15,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.healthyteam.android.healthylifers.Domain.EventLocation;
+import com.healthyteam.android.healthylifers.Domain.Location;
 import com.healthyteam.android.healthylifers.Domain.User;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 @IgnoreExtraProperties
 public class UserData {
@@ -38,7 +45,7 @@ public class UserData {
     @Exclude
     private static UserData UserInstance;
     @Exclude
-    private static List<LocationModel> LocationListInstace;
+    private static List<Location> LocationListInstance;
     @Exclude
     private static List<User> FriendListInstance;
     @Exclude
@@ -47,6 +54,7 @@ public class UserData {
     public UserData (){
     }
 
+    //TODO: testiraj funkcije za citanje iz baze. Mozda se rezultat koji vracaju menja sa referencom koju vracaju
     private static DatabaseReference getDatabase(){
         if(mDatabase==null)
             mDatabase=FirebaseDatabase.getInstance().getReference();
@@ -90,7 +98,12 @@ public class UserData {
         return FriendListInstance;
     }
     public void Update(){
-        getDatabase().child(Constants.UsersNode).child(UID).setValue(this);
+        FirebaseDatabase.getInstance().getReference().child(Constants.UsersNode).child(UID).setValue(this).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.println(Log.WARN,"Database:",e.getMessage());
+            }
+        });
     }
     public static List<User> getWorldUser(){
         if(WorldUsersInstance ==null){
@@ -116,6 +129,52 @@ public class UserData {
         }
         return WorldUsersInstance;
     }
+    public static List<User> getMoreWorldUsers(){
+            Query query =getDatabase().child(Constants.UsersNode).orderByChild(Constants.UserPointsAtt)
+                    .limitToLast(WorldUsersInstance.size()+Constants.showUserCount)
+                    .limitToFirst(Constants.showUserCount);
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for(DataSnapshot userSnapshot:dataSnapshot.getChildren()){
+                        User u = new User();
+                        u.setData(userSnapshot.getValue(UserData.class));
+                        if(u.getUID().equals(WorldUsersInstance.get(WorldUsersInstance.size()-1).getUID()))
+                            return;
+                        WorldUsersInstance.add(0,u);
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        return WorldUsersInstance;
+    }
+  /*  public List<Location> getUserPosts(){
+        LocationListInstance=new ArrayList<>();
+        final List<String> postIds= this.PostsIds;
+        getDatabase().child(Constants.UsersNode).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(String postId: postIds){
+                    Location location = new Location();
+                    LocationModel data= LocationModel.getLocation(postId);
+                    //location.setData(data)
+                    LocationListInstance.add(location);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        return LocationListInstance;
+    }*/
 
 
 }

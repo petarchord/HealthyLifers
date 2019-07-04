@@ -17,7 +17,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.User;
 
 //ctrl + o = open event handlers menu
 
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        testFunction();
         btnExit = (ImageButton)findViewById(R.id.btnExit);
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         settingsDialog = new Dialog(this);
@@ -132,5 +136,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    void testFunction(){
+        User u = DomainController.getUser();
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+        u.setUID(db.push().getKey());
+        u.Update();
     }
 }

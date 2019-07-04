@@ -10,11 +10,11 @@ import java.util.List;
 
 
 public class Location {
-    enum Category {
+    public static enum Category {
         EVENT, HEALTHYFOOD, COURT, FITNESSCENTER
     }
 
-    enum Rate {
+    public static enum Rate {
         NONE, LIKE, DISLIKE
     }
 
@@ -49,7 +49,7 @@ public Location(Bitmap locaitonPic, String name, String descripition, String dat
         this.setAuthor(author);
         this.setTagList(tagList);
     }
-
+public Location(){}
 
     //region private funciton
     private String getDate() {

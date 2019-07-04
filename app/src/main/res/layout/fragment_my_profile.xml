@@ -13,8 +13,32 @@
         android:layout_height="205dp"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp" />
+
+    <ImageButton
+        android:id="@+id/button_TakePicMP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/imageView_ProfilePicMP"
+        android:layout_toEndOf="@id/imageView_ProfilePicMP"
         android:layout_marginTop="15dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/baseline_add_a_photo_24"
+         />
+
+    <ImageButton
+        android:id="@+id/button_ChoosePicMP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/imageView_ProfilePicMP"
+        android:layout_toEndOf="@id/imageView_ProfilePicMP"
+        android:layout_below="@id/button_TakePicMP"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/baseline_add_photo_alternate_black_24" />
+
     <LinearLayout
         android:id="@+id/LinearLayout_UserInfo"
         android:layout_below="@id/imageView_ProfilePicMP"
@@ -166,4 +190,5 @@
                 />
         </LinearLayout>
     </LinearLayout>
+
 </RelativeLayout>

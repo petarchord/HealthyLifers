@@ -1,6 +1,8 @@
 package com.healthyteam.android.healthylifers;
 
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -20,6 +22,11 @@ import android.widget.TextView;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.User;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.Set;
+
 public class MyFriendsFragment extends Fragment {
     private View fragment_layout;
     private ListView lvFriends;
@@ -32,6 +39,7 @@ public class MyFriendsFragment extends Fragment {
     private Button dialogBtnNo;
     private static MyFriendsFragment instance;
     private MyFriendAdapter adapter;
+    private BluetoothAdapter mBlueAdapter;
 
     public static MyFriendsFragment getInstance(){
         if(instance==null)
@@ -56,6 +64,9 @@ public class MyFriendsFragment extends Fragment {
         addFriendDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBtnOk = addFriendDialog.findViewById(R.id.button_okDAF);
         dialogBtnCancel=addFriendDialog.findViewById(R.id.button_cancelDAF);
+
+        mBlueAdapter = BluetoothAdapter.getDefaultAdapter();
+
 
         dialogBtnNo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,7 +167,8 @@ public class MyFriendsFragment extends Fragment {
         @Override
         public int getCount() {
             //get count from some android service
-            return 0;
+
+            return mBlueAdapter.getBondedDevices().size();
         }
 
         @Override
@@ -171,6 +183,15 @@ public class MyFriendsFragment extends Fragment {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
+            final LayoutInflater inflater = getLayoutInflater();
+            final int index =i;
+            view = inflater.inflate(R.layout.layout_bluetooth_item,null);
+            TextView bluetoothName = view.findViewById(R.id.TextView_BluetoothNameBI);
+            ArrayList<BluetoothDevice> devices =(ArrayList<BluetoothDevice>) mBlueAdapter.getBondedDevices();
+            BluetoothDevice device = devices.get(index);
+            bluetoothName.setText(device.getName());
+
+
             //init bluetooth name and set onClick Listeners
 
             return view;

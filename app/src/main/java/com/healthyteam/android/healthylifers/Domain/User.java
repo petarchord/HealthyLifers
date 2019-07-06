@@ -2,6 +2,9 @@ package com.healthyteam.android.healthylifers.Domain;
 
 
 
+import android.net.Uri;
+
+import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Data.UserData;
 
 import java.util.List;
@@ -22,6 +25,7 @@ public class User {
     }
 
     public User(){
+        data = new UserData();
         }
 
 
@@ -72,6 +76,12 @@ public class User {
     public Integer getPostsCount(){
         return getPosts().size();
     }
+    public List<String> getFriendsIds(){
+        return data.FriendsIds;
+    }
+    public List<String> getPostsIds(){
+        return data.PostsIds;
+    }
 
     //endregion
     //region Test
@@ -108,6 +118,16 @@ public class User {
     public void setFriendList(List<User> friendList) {
         this.friendList = friendList;
     }
+    public void setLatitude(Double lat){
+        data.Latitude=lat;
+    }
+    public void setLongitude(Double lon){
+        data.Longitude= lon;
+    }
+    public void setCity(String city){
+        data.City=city;
+
+    }
     public void setData(UserData data){
         this.data=data;
     }
@@ -119,8 +139,11 @@ public class User {
         getFriendList().remove(friend);
     }
 
-    public void Update(){
-        data.Update();
+    public void Save(){
+        data.Save();
+    }
+    public  boolean UpadatePicture(Uri imageUri, OnUploadDataListener listener){
+        return  data.uploadPhoto(imageUri,listener);
     }
 
     //endregion

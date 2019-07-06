@@ -9,7 +9,9 @@ public class Constants {
     public static final String PictureNode = "picture";
 
     public static final String UserPointsAtt = "Points";
+    public static final String UserFriendIdsAtt = "FriendIds";
     public static final String LocationCategoryAtt="Category";
+
     public static final Integer showUserCount = 30;
     public static final Integer LocationCategoryEvent = Location.Category.EVENT.ordinal();
     public static final Integer LocationCategoryHealthyFood =Location.Category.HEALTHYFOOD.ordinal();

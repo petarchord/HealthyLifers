@@ -1,16 +1,22 @@
 package com.healthyteam.android.healthylifers;
 
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +27,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.TestFunctions;
 import com.healthyteam.android.healthylifers.Domain.User;
 
 import org.w3c.dom.Text;
+
+import java.io.File;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -132,6 +143,11 @@ public class MyProfileFragment extends Fragment {
                 openFileChooser();
             }
         });
+        btnTakePic.setOnClickListener(new View.OnClickListener() {
+                                          @Override
+                                          public void onClick(View v) {
+                                              setRadnomImageUri();
+                                          }});
         dialogBtnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,12 +174,47 @@ public class MyProfileFragment extends Fragment {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             mImageUri = data.getData();
-
+            Log.i("onChoosePic:", mImageUri.getPath());
             ProfilePic.setImageURI(mImageUri);
-
         }
     }
+    //region test
+    void setRadnomImageUri(){
+        int num = TestFunctions.randBetween(1,36);
+        File avatarFile = new File(Environment.getExternalStorageDirectory() + "/Avatar/" + num +".png");
+        Log.i("beforeScan", avatarFile.getPath());
+        MediaScannerConnection.scanFile(getContext(),
+                new String[] { avatarFile.getAbsolutePath() }, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("onScanCompleted", uri.getPath());
+                        mImageUri = uri;
+                        ProfilePic.setImageURI(mImageUri);
+                        if (!DomainController.getUser().UpadatePicture(mImageUri, new OnUploadDataListener() {
+                            @Override
+                            public void onStart() {
 
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void onFailed(Exception e) {
+                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        })) {
+                            Toast.makeText(getContext(), "No file selected", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+    }
+
+
+    //endregion
     class EditBtnListener implements View.OnClickListener {
 
 

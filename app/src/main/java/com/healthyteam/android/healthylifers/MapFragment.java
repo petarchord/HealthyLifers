@@ -109,13 +109,13 @@ public class MapFragment extends Fragment {
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             /*   if(addPlace){
+                if(addPlace){
                     pickLocationOptionOff();
                     return;
                 }
-                pickLocationOptionOn(); */
-                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                addItemDialog.show();
+                pickLocationOptionOn();
+//                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                addItemDialog.show();
 
             }
         });
@@ -326,6 +326,8 @@ public class MapFragment extends Fragment {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 Toast.makeText(context,marker.getPosition().getLatitude() + " - "+marker.getPosition().getLongitude(),Toast.LENGTH_LONG).show();
+                Log.println(Log.INFO,"Map", "latitude: " + marker.getPosition().getLatitude()+ ", "
+                        + "longitude: " + marker.getPosition().getLongitude());
                 return true;
             }
         });

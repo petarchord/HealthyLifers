@@ -20,6 +20,7 @@ import android.support.v4.app.Fragment;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.TestFunctions;
 import com.healthyteam.android.healthylifers.Domain.User;
 
 //ctrl + o = open event handlers menu
@@ -65,13 +66,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //should call from SignIn Activity
+        TestFunctions.setContext(this);
         DomainController.setUser("u","p");
         //configure toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        testFunction();
+    //    testFunction();
 
         addItemDialog = new Dialog(this);
         addItemDialog.setContentView(R.layout.dialog_add_item);
@@ -147,6 +149,6 @@ public class MainActivity extends AppCompatActivity {
         User u = DomainController.getUser();
         DatabaseReference db = FirebaseDatabase.getInstance().getReference();
         u.setUID(db.push().getKey());
-        u.Update();
+        u.Save();
     }
 }

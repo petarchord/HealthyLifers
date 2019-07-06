@@ -1,7 +1,6 @@
 package com.healthyteam.android.healthylifers.Data;
 
-import android.content.res.Configuration;
-import android.renderscript.RenderScript;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -15,14 +14,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.healthyteam.android.healthylifers.Domain.EventLocation;
-import com.healthyteam.android.healthylifers.Domain.Location;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.healthyteam.android.healthylifers.Domain.User;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 @IgnoreExtraProperties
 public class UserData {
@@ -42,130 +40,129 @@ public class UserData {
     public String UID;
     @Exclude
     private static DatabaseReference mDatabase;
-    @Exclude
-    private static UserData UserInstance;
-    @Exclude
-    private static List<Location> LocationListInstance;
-    @Exclude
-    private static List<User> FriendListInstance;
-    @Exclude
-    private static List<User> WorldUsersInstance;
 
     public UserData (){
+        ImageUrl=null;
+        Email=null;
+        FriendsIds=new ArrayList<String>();
+        PostsIds = new ArrayList<String>();
     }
 
-    //TODO: testiraj funkcije za citanje iz baze. Mozda se rezultat koji vracaju menja sa referencom koju vracaju
-    private static DatabaseReference getDatabase(){
-        if(mDatabase==null)
-            mDatabase=FirebaseDatabase.getInstance().getReference();
-        return mDatabase;
-    }
-    public static UserData getUser(String UID){
-        final String uid=UID;
-        getDatabase().child(Constants.UsersNode).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserInstance = dataSnapshot.child(uid).getValue(UserData.class);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        UserInstance.UID=uid;
-        return UserInstance;
-    }
-    public List<User> getFriends(){
-        FriendListInstance=new ArrayList<>();
-        final List<String> friendsIds= this.FriendsIds;
-        getDatabase().child(Constants.UsersNode).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(String FriendId: friendsIds){
-                    UserData data= dataSnapshot.child(Constants.UsersNode).child(FriendId).getValue(UserData.class);
-                    User friend = new User();
-                    friend.setData(data);
-                    FriendListInstance.add(friend);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        return FriendListInstance;
-    }
-    public void Update(){
-        FirebaseDatabase.getInstance().getReference().child(Constants.UsersNode).child(UID).setValue(this).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.println(Log.WARN,"Database:",e.getMessage());
-            }
-        });
-    }
-    public static List<User> getWorldUser(){
-        if(WorldUsersInstance ==null){
-            WorldUsersInstance=new ArrayList<>();
-            Query query =getDatabase().child(Constants.UsersNode).orderByChild(Constants.UserPointsAtt).limitToFirst(Constants.showUserCount);
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
+    @Exclude
+    public void Save(){
+        try {
+            FirebaseDatabase.getInstance().getReference().child(Constants.UsersNode).child(UID).setValue(this).addOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for(DataSnapshot userSnapshot:dataSnapshot.getChildren()){
-                        User u = new User();
-                        u.setData(userSnapshot.getValue(UserData.class));
-                        WorldUsersInstance.add(0,u);
-                    }
-
-
+                public void onFailure(@NonNull Exception e) {
+                    Log.println(Log.WARN, "Database:", e.getMessage());
                 }
-
+            }).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                public void onSuccess(Void aVoid) {
+                    Log.println(Log.WARN, "Database: ", "Success");
                 }
             });
         }
-        return WorldUsersInstance;
+        catch(Exception e){
+            Log.println(Log.ERROR, "Database:", e.getMessage());
+        }
     }
-    public static List<User> getMoreWorldUsers(){
-            Query query =getDatabase().child(Constants.UsersNode).orderByChild(Constants.UserPointsAtt)
-                    .limitToLast(WorldUsersInstance.size()+Constants.showUserCount)
-                    .limitToFirst(Constants.showUserCount);
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for(DataSnapshot userSnapshot:dataSnapshot.getChildren()){
-                        User u = new User();
-                        u.setData(userSnapshot.getValue(UserData.class));
-                        if(u.getUID().equals(WorldUsersInstance.get(WorldUsersInstance.size()-1).getUID()))
-                            return;
-                        WorldUsersInstance.add(0,u);
-                    }
+    @Exclude
+    public boolean uploadPhoto(final Uri ImageUri, final OnUploadDataListener listener ) {
+        listener.onStart();
+        if (ImageUri != null) {
+            StorageReference fileReference = FirebaseStorage.getInstance().
+                    getReference("uploads").
+                    child(String.valueOf( UID));
 
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        return WorldUsersInstance;
+            fileReference.putFile(ImageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                         //   Toast.makeText(context, "Upload successful", Toast.LENGTH_LONG).show();
+                            ImageUrl= taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+                            Save();
+                            listener.onSuccess();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            listener.onFailed(e);
+                       //     Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            return true;
+        }
+        else {
+            return false;
+        }
     }
-  /*  public List<Location> getUserPosts(){
-        LocationListInstance=new ArrayList<>();
-        final List<String> postIds= this.PostsIds;
+    //TODO: testiraj funkcije za citanje iz baze. Mozda se rezultat koji vracaju menja sa referencom koju vracaju
+    private static DatabaseReference getDatabase() {
+        if (mDatabase == null)
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+        return mDatabase;
+    }
+    public static void getUser(String UID, final OnGetDataListener listener){
+        listener.onStart();
+        getDatabase().child(Constants.UsersNode).child(UID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                listener.onSuccess(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                listener.onFailed(databaseError);
+            }
+        });
+    }
+    @Exclude
+    public static void  getUsers(final OnGetDataListener listener){
+        listener.onStart();
         getDatabase().child(Constants.UsersNode).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(String postId: postIds){
-                    Location location = new Location();
-                    LocationModel data= LocationModel.getLocation(postId);
-                    //location.setData(data)
-                    LocationListInstance.add(location);
-                }
+                listener.onSuccess(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                listener.onFailed(databaseError);
+            }
+        });
+
+    }
+
+    @Exclude
+    public static void getWorldUsers(final OnGetDataListener listener){
+        listener.onStart();
+        Query query =getDatabase().child(Constants.UsersNode).orderByChild(Constants.UserPointsAtt).limitToLast(Constants.showUserCount);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //send in ascending order
+                listener.onSuccess(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                listener.onFailed(databaseError);
+            }
+        });
+    }
+    @Exclude
+    public static void getMoreWorldUsers(List<User> worldList, final OnGetDataListener listener){
+        listener.onStart();
+        Query query =getDatabase().child(Constants.UsersNode).orderByChild(Constants.UserPointsAtt)
+                .limitToLast(worldList.size()+Constants.showUserCount)
+                .limitToFirst(Constants.showUserCount);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //send in ascending order. Listener need to check last elements
+                listener.onSuccess(dataSnapshot);
             }
 
             @Override
@@ -173,8 +170,7 @@ public class UserData {
 
             }
         });
-        return LocationListInstance;
-    }*/
+    }
 
 
 }

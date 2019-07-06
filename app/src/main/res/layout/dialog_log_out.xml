@@ -21,6 +21,7 @@
     >
 
     <android.support.v7.widget.AppCompatButton
+        android:id="@+id/yesLogOut"
         android:layout_width="110dp"
         android:layout_height="50dp"
         android:text="Log out"
@@ -31,6 +32,7 @@
         />
 
     <android.support.v7.widget.AppCompatButton
+        android:id="@+id/noLogOut"
         android:text="cancel"
         android:layout_width="110dp"
         android:layout_height="50dp"

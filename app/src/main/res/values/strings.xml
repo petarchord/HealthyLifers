@@ -41,4 +41,5 @@
     <string name="passError_oldPass">*Your old password appears to be incorrect</string>
     <string name="passError_matchPass">*Passwords need to match</string>
     <string name="post_button">Post</string>
+    <string name="location_desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam</string>
 </resources>

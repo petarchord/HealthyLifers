@@ -1,24 +1,30 @@
 package com.healthyteam.android.healthylifers;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.auth.FirebaseAuth;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.TestFunctions;
 import com.healthyteam.android.healthylifers.Domain.User;
@@ -30,8 +36,19 @@ public class MainActivity extends AppCompatActivity {
     private Dialog logOutDialog;
     private Dialog settingsDialog;
     private Dialog addItemDialog;
+    private Dialog locationViewDialog;
     private ImageButton btnExit;
     private Fragment settingsFragment = null;
+    private Fragment tabInfoFragment;
+    private Fragment tabCommentsFragment;
+    private SectionsPageAdapter mSectionPageAdapter;
+    private FirebaseAuth mAuth;
+    private Button yesLogOut;
+    private Button noLogOut;
+
+    private TabLayout tabLayout;
+    private ViewPager mViewPager;
+
     BottomNavigationView navigation;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -75,8 +92,24 @@ public class MainActivity extends AppCompatActivity {
 
     //    testFunction();
 
+        mAuth = FirebaseAuth.getInstance();
+
+
         addItemDialog = new Dialog(this);
         addItemDialog.setContentView(R.layout.dialog_add_item);
+
+        mSectionPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
+
+        locationViewDialog = new Dialog(this);
+        locationViewDialog.setContentView(R.layout.dialog_location_view);
+
+        tabLayout = locationViewDialog.findViewById(R.id.tabsLocation);
+        mViewPager = locationViewDialog.findViewById(R.id.viewPagerLocation);
+
+        setUpViewPager(mViewPager);
+        tabLayout.setupWithViewPager(mViewPager);
+
+
 
         btnExit = (ImageButton)findViewById(R.id.btnExit);
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -86,6 +119,23 @@ public class MainActivity extends AppCompatActivity {
 
         logOutDialog = new Dialog(this);
         logOutDialog.setContentView(R.layout.dialog_log_out);
+
+        yesLogOut = logOutDialog.findViewById(R.id.yesLogOut);
+        noLogOut = logOutDialog.findViewById(R.id.noLogOut);
+
+        yesLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
+
+        noLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logOutDialog.dismiss();
+            }
+        });
 
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +151,24 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     MapFragment.getInstance()).commit();
         }
+    }
+
+
+    private void signOut() {
+        mAuth.signOut();
+        Intent i = new Intent(getApplicationContext(),SignInActivity.class);
+        startActivity(i);
+      //  updateUI(null);
+    }
+
+    public void setUpViewPager(ViewPager viewPager)
+    {
+        SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
+        tabInfoFragment = new Fragment();
+        tabCommentsFragment = new Fragment();
+        adapter.addFragment(tabInfoFragment,"TabInfoFragment");
+        adapter.addFragment(tabCommentsFragment,"TabCommentsFragment");
+        mViewPager.setAdapter(adapter);
     }
 
 
@@ -120,8 +188,8 @@ public class MainActivity extends AppCompatActivity {
         {
             case R.id.app_bar_search:
                 Log.d("MyTag","Search clicked!");
-                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                addItemDialog.show();
+                locationViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                locationViewDialog.show();
 
                 break;
 

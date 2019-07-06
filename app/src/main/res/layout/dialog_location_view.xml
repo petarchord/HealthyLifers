@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="350dp"
+        android:layout_height="600dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/add_item_window"
+
+        >
+
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/closeSignInForm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/close_box_add_item"
+            android:layout_gravity="right"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:padding="0dp"
+            android:background="#000000"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:background="#FFFFFF"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+
+                />
+
+
+
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            >
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name of location"
+                android:textColor="@color/colorSignInText"
+                android:textSize="25dp"
+                />
+
+            <ImageButton
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/thumb_up"
+                android:scaleType="center"
+                android:background="#389DB4"
+                />
+
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/thumb_down"
+                android:scaleType="center"
+                android:background="#389DB4"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="45"
+                android:textSize="20dp"
+                android:layout_marginLeft="240dp"
+                android:textColor="#74D080"
+
+                />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5"
+                android:textSize="20dp"
+                android:layout_marginLeft="30dp"
+                android:textColor="#81312D"
+
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="?"
+                android:textSize="35dp"
+                android:layout_marginLeft="20dp"
+                />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Some user"
+                android:textSize="20dp"
+                android:layout_marginLeft="10dp"
+                />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remaining time:"
+                android:textSize="16dp"
+                android:textColor="#81312D"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                />
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:textColor="#81312D"
+                android:text="1:42:14"
+                android:layout_marginTop="15dp"
+                />
+        </LinearLayout>
+
+
+        <android.support.design.widget.TabLayout
+            android:layout_marginTop="20dp"
+            android:id="@+id/tabsLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </android.support.design.widget.TabLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPagerLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            >
+
+        </android.support.v4.view.ViewPager>
+
+
+
+
+
+
+
+    </LinearLayout>
+
+</ScrollView>

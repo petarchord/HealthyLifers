@@ -22,10 +22,12 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +50,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.healthyteam.android.healthylifers.Domain.Builder;
 import com.healthyteam.android.healthylifers.Domain.LocationBuilder;
 import com.healthyteam.android.healthylifers.Domain.User;
+import com.karumi.dexter.BuildConfig;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -78,6 +81,9 @@ public class MapFragment extends Fragment {
     private LocationManager locationManager;
     MyLocationNewOverlay myLocationOverlay;
     private Dialog addItemDialog;
+    private Dialog locationViewDialog;
+    private Fragment tabInfoFragment;
+    private Fragment tabCommentsFragment;
 
     // bunch of location related apis
     private FusedLocationProviderClient mFusedLocationClient;
@@ -86,6 +92,9 @@ public class MapFragment extends Fragment {
     private Double currZoom=null;
     private LocationSettingsRequest mLocationSettingsRequest;
     private LocationRequest mLocationRequest;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+    private SectionsPageAdapter mSectionPageAdapter;
 
     private boolean addPlace = false;
 
@@ -103,8 +112,21 @@ public class MapFragment extends Fragment {
         setLocationSettings();
         setAddLocationListener();
 
+        mSectionPageAdapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
+
+
+
         addItemDialog = new Dialog(getContext());
         addItemDialog.setContentView(R.layout.dialog_add_item);
+
+        locationViewDialog = new Dialog(getContext());
+        locationViewDialog.setContentView(R.layout.dialog_location_view);
+
+        tabLayout = locationViewDialog.findViewById(R.id.tabsLocation);
+        viewPager = locationViewDialog.findViewById(R.id.viewPagerLocation);
+
+        setUpViewPager(viewPager);
+        tabLayout.setupWithViewPager(viewPager);
 
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,6 +142,17 @@ public class MapFragment extends Fragment {
             }
         });
         return layour_fragment;
+    }
+
+
+    public void setUpViewPager(ViewPager viewPager)
+    {
+        SectionsPageAdapter adapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
+        tabInfoFragment = new Fragment();
+        tabCommentsFragment = new Fragment();
+        adapter.addFragment(tabInfoFragment,"TabInfoFragment");
+        adapter.addFragment(tabCommentsFragment,"TabCommentsFragment");
+        viewPager.setAdapter(adapter);
     }
 
     @Override

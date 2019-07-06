@@ -53,7 +53,7 @@
               />
 
           <android.support.v7.widget.AppCompatEditText
-              android:id="@+id/usernameSignIn"
+              android:id="@+id/signinEmail"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:hint="Enter your username or email"
@@ -88,7 +88,7 @@
 
           <android.support.v7.widget.AppCompatEditText
               android:inputType="textPassword"
-              android:id="@+id/passwordSignIn"
+              android:id="@+id/signinPassword"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:hint="Enter your password"

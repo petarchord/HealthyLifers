@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "708543554592",
+    "firebase_url": "https://healthylifers-b3634.firebaseio.com",
+    "project_id": "healthylifers-b3634",
+    "storage_bucket": "healthylifers-b3634.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708543554592:android:822ba6901d5cfa93",
+        "android_client_info": {
+          "package_name": "com.healthyteam.android.healthylifers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708543554592-nehjfa6vpuu08vqjvga89c36b096suon.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.healthyteam.android.healthylifers",
+            "certificate_hash": "48c732dbc63f26663f30f0cf095c84ce6a7e7fa7"
+          }
+        },
+        {
+          "client_id": "708543554592-mltb8eh0oapn5p98o3bhssvisljnjeer.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key":"AIzaSyBPhwfmRKkjzunPZtLywL9Ggh4nj7RU3z0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id":"708543554592-mltb8eh0oapn5p98o3bhssvisljnjeer.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

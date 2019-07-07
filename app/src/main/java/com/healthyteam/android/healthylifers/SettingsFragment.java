@@ -35,6 +35,15 @@ public class SettingsFragment extends Fragment {
         bluetooth.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+              /*  if(mBlueAdapter.isEnabled())
+                {
+                    buttonView.setChecked(false);
+                }
+                else
+                {
+                    buttonView.setChecked(true);
+                }*/
+
 
                 if(isChecked)
                 {
@@ -46,8 +55,8 @@ public class SettingsFragment extends Fragment {
                     }
                     if(!mBlueAdapter.isDiscovering())
                     {
-                       /* Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-                        startActivity(intent); */
+                        /*Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                        startActivity(intent);*/
                         mBlueAdapter.startDiscovery();
 
                     }

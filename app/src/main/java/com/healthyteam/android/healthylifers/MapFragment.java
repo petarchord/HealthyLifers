@@ -366,6 +366,7 @@ public class MapFragment extends Fragment {
         });
         map.getOverlays().add(likeMarker);
 
+
     }
 
      //function should recive Location parametar in the future

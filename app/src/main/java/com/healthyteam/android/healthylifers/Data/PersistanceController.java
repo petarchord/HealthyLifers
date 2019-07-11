@@ -7,9 +7,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.healthyteam.android.healthylifers.Domain.Constants;
 import com.healthyteam.android.healthylifers.Domain.User;
-
-import java.util.List;
 
 public class PersistanceController {
     private static DatabaseReference dbReference;

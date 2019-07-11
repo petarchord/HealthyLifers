@@ -34,6 +34,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
+import com.healthyteam.android.healthylifers.Data.UserData;
+import com.healthyteam.android.healthylifers.Domain.User;
 
 
 public class SignInActivity extends AppCompatActivity {
@@ -165,42 +168,7 @@ public class SignInActivity extends AppCompatActivity {
     } */
 
 
-    private void signIn(String email, String password) {
-        Log.d(TAG, "signIn:" + email);
-        if (!validateSigninForm()) {
-            return;
-        }
 
-     //   showProgressDialog();
-
-        // [START sign_in_with_email]
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(SignInActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-
-                        // [START_EXCLUDE]
-                      /*  if (!task.isSuccessful()) {
-                            mStatusTextView.setText(R.string.auth_failed);
-                        }
-                        hideProgressDialog(); */
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END sign_in_with_email]
-    }
 
 
  /*   private void signOut() {
@@ -292,41 +260,65 @@ public class SignInActivity extends AppCompatActivity {
     }
 
 
-    private void createAccount(String email, String password) {
-        Log.d(TAG, "createAccount:" + email);
-        if (!validateRegisterForm()) {
-            return;
-        }
+    private void createAccount(final String email, final String password) {
+        User.createAccount(email, password, new OnRunTaskListener() {
+            @Override
+            public void OnStart() {
+                Log.d(TAG, "createAccount:" + email);
+                if (!validateRegisterForm()) {
+                    return;
+                }
+            }
 
-       // showProgressDialog();
+            @Override
+            public void OnComplete(Task<?> task) {
+                if (task.isSuccessful()) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "createUserWithEmail:success");
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    updateUI(user);
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                    Toast.makeText(SignInActivity.this, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show();
+                    updateUI(null);
+                }
+            }
+        });
 
-        // [START create_user_with_email]
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignInActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-
-                        // [START_EXCLUDE]
-                      //  hideProgressDialog();
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END create_user_with_email]
     }
 
+    private void signIn(final String email, final String password) {
+        User.signIn(email, password, new OnRunTaskListener() {
+            @Override
+            public void OnStart() {
+                Log.d(TAG, "signIn:" + email);
+                if (!validateSigninForm()) {
+                    return;
+                }
+            }
 
+            @Override
+            public void OnComplete(Task<?> task) {
+                if (task.isSuccessful()) {
+                    // Sign in success, update UI with the signed-in user's information
+                    //TODO: create new user, initilize wtih database data, activate it and call DataConttroler.SetUser(...)
+                    //TODO: deactivate user when log out
+                    Log.d(TAG, "signInWithEmail:success");
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    updateUI(user);
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInWithEmail:failure", task.getException());
+                    Toast.makeText(SignInActivity.this, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show();
+                    updateUI(null);
+                }
+            }
+        });
+
+    }
     private void updateUI(FirebaseUser user) {
        // hideProgressDialog();
         if (user != null) {

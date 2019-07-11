@@ -17,8 +17,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseError;
+import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.User;
+
+import java.util.List;
 
 public class MyFriendsFragment extends Fragment {
     private View fragment_layout;
@@ -82,16 +88,52 @@ public class MyFriendsFragment extends Fragment {
             }
         });
         adapter = new MyFriendAdapter();
-        lvFriends.setAdapter(adapter);
+        //TODO: test this. Check list initialisation
+        DomainController.getUser().addGetFriendListener(new OnGetListListener() {
+            @Override
+            public void onChildAdded(List<?> list, int index) {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChange(List<?> list, int index) {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemove(List<?> list, int index,Object removedObject) {
+               adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(List<?> list, int index) {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onListLoaded(List<?> list) {
+                adapter.setFriends((List<User>) list);
+                lvFriends.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCanclled(DatabaseError error) {
+
+            }
+        });
+
 
         return fragment_layout;
     }
 
     public class MyFriendAdapter extends BaseAdapter {
-
+        List<User> friends;
+        public void setFriends(List<User> friends){
+            this.friends=friends;
+        }
         @Override
         public int getCount() {
-            return DomainController.getUser().getFriendList().size();
+            return friends.size();
         }
 
         @Override
@@ -116,7 +158,7 @@ public class MyFriendsFragment extends Fragment {
             ImageView imageProfile = (ImageView) view.findViewById(R.id.imageView_ProfilePic);
 
             imageProfile.setImageResource(R.drawable.profile_picture);
-            final User friend = DomainController.getUser().getFriendList().get(i);
+            final User friend = friends.get(i);
             String NameSurname = friend.getName() + " " + friend.getSurname();
             txtName.setText(NameSurname);
             txtUsername.setText(friend.getUsername());
@@ -138,8 +180,7 @@ public class MyFriendsFragment extends Fragment {
                     dialogBtnYes.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            DomainController.getUser().deleteFriend(friend);
-                            adapter.notifyDataSetChanged();
+                            DomainController.getUser().deleteFriend(friend.getUID());
                             deleteFriendDialog.cancel();
                         }
                     });

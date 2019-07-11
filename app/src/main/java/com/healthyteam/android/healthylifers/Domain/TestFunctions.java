@@ -56,7 +56,7 @@ public class TestFunctions {
         String name= Names[i%Names.length];
         String surname= Surnames[i%Surnames.length];
         String email = testString +userIndex + "@" + testString + ".com";
-        String username = testString + userIndex;
+        String username = testString + "00"+ userIndex++;
         Double longitude = getRanLongitude();
         Double latitude = getRanLatitude();
         String City="";

@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseError;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.User;
@@ -34,13 +35,37 @@ public class WorldScoreFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         layout_fragment = inflater.inflate(R.layout.fragment_world_score,container,false);
         listWorldScore = (ListView) layout_fragment.findViewById(R.id.ListView_worldScore);
-
-        DomainController.getWorldScoreUsersDB(new OnGetListListener() {
+        final WorldScoreAdapter adapter = new WorldScoreAdapter();
+        DomainController.addGetWorldScoreListeners(new OnGetListListener() {
             @Override
-            public void onSucces(List<?> list) {
-                WorldScoreAdapter adapter = new WorldScoreAdapter();
+            public void onChildAdded(List<?> list, int index) {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChange(List<?> list, int index) {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemove(List<?> list, int index, Object removedObject) {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(List<?> list, int index) {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onListLoaded(List<?> list) {
                 adapter.setWorldUser((List<User>) list);
                 listWorldScore.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCanclled(DatabaseError error) {
+
             }
         });
 

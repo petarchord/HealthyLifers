@@ -1,4 +1,4 @@
-package com.healthyteam.android.healthylifers.Data;
+package com.healthyteam.android.healthylifers.Domain;
 
 import com.healthyteam.android.healthylifers.Domain.Location;
 
@@ -10,6 +10,8 @@ public class Constants {
 
     public static final String UserPointsAtt = "Points";
     public static final String UserFriendIdsAtt = "FriendIds";
+    public static final String UserActiveAtt="Active";
+    public static final String UserCityAtt="City";
     public static final String LocationCategoryAtt="Category";
 
     public static final Integer showUserCount = 30;

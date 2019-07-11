@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
@@ -33,10 +35,12 @@ import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.TestFunctions;
 import com.healthyteam.android.healthylifers.Domain.User;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.net.URL;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -158,7 +162,11 @@ public class MyProfileFragment extends Fragment {
         txtNameSurname.setText(NameSurname);
         txtUsername.setText(DomainController.getUser().getUsername());
         txtPoints.setText(DomainController.getUser().getPointsStirng());
-        ProfilePic.setImageResource(R.drawable.profile_picture);
+        if(DomainController.getUser().getImageUrl()!=null) {
+            Picasso.get().load(DomainController.getUser().getImageUrl()).into(ProfilePic);
+        }
+        else
+            ProfilePic.setImageResource(R.drawable.profile_picture);
 
         return fragment_layout;
     }
@@ -190,7 +198,7 @@ public class MyProfileFragment extends Fragment {
                         Log.i("onScanCompleted", uri.getPath());
                         mImageUri = uri;
                         ProfilePic.setImageURI(mImageUri);
-                        if (!DomainController.getUser().UpadatePicture(mImageUri, new OnUploadDataListener() {
+                        boolean fileSelected = DomainController.getUser().UpadatePicture(mImageUri, new OnUploadDataListener() {
                             @Override
                             public void onStart() {
 
@@ -205,10 +213,9 @@ public class MyProfileFragment extends Fragment {
                             public void onFailed(Exception e) {
                                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
-                        })) {
+                        });
+                        if (!fileSelected)
                             Toast.makeText(getContext(), "No file selected", Toast.LENGTH_SHORT).show();
-                        }
-
                     }
                 });
     }

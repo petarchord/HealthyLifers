@@ -4,8 +4,11 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TabLayout;
@@ -20,19 +23,36 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
+import android.widget.Toast;
 
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ValueEventListener;
+import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
+import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
+import com.healthyteam.android.healthylifers.Domain.Constants;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
+import com.healthyteam.android.healthylifers.Domain.OnGetObjectListener;
 import com.healthyteam.android.healthylifers.Domain.TestFunctions;
 import com.healthyteam.android.healthylifers.Domain.User;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 //ctrl + o = open event handlers menu
 
 public class MainActivity extends AppCompatActivity {
-
+    //region test
+    List<String> UserIds;
+    int index=0;
+    //endregion
     private Dialog logOutDialog;
     private Dialog settingsDialog;
     private Dialog addItemDialog;
@@ -83,17 +103,44 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //should call from SignIn Activity
-        TestFunctions.setContext(this);
-        DomainController.setUser("u","p");
+
+
         //configure toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-    //    testFunction();
+
 
         mAuth = FirebaseAuth.getInstance();
+         //region test
+        TestFunctions.setContext(this);
+        final User u = TestFunctions.createUser();
+        User.signIn(u.getEmail(), u.getUsername(), new OnRunTaskListener() {
+            @Override
+            public void OnStart() {
 
+            }
+
+            @Override
+            public void OnComplete(Task<?> task) {
+                if(task.isComplete()){
+                    User.getUser(mAuth.getCurrentUser().getUid(), new OnGetObjectListener() {
+                        @Override
+                        public void OnSuccess(Object o) {
+                            DomainController.setUser((User) o);
+                        }
+                    });
+                }
+                else{
+                    createNewUser(u);
+                    DomainController.setUser(u);
+                }
+            }
+        });
+
+        //testFunction();
+        //endregion
 
         addItemDialog = new Dialog(this);
         addItemDialog.setContentView(R.layout.dialog_add_item);
@@ -214,9 +261,124 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     void testFunction(){
-        User u = DomainController.getUser();
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-        u.setUID(db.push().getKey());
-        u.Save();
+            getUsersIDs(new OnGetObjectListener() {
+            @Override
+            public void OnSuccess(Object o) {
+                final User u = TestFunctions.createUser();
+
+                User.signIn(u.getEmail(), u.getUsername(), new OnRunTaskListener() {
+                    @Override
+                    public void OnStart() {
+
+                    }
+
+                    @Override
+                    public void OnComplete(Task<?> task) {
+                        if(task.isComplete()){
+                            u.setUID(mAuth.getCurrentUser().getUid());
+                            u.setFriendIds(getRandomIds(u.getUID()));
+                            u.Save();
+                            setRadnomImageUri(u);
+                            DomainController.setUser(u);
+                            index++;
+                            if(index<50)
+                                testFunction();
+
+                        }
+                        else{
+                            createNewUser(u);
+                            DomainController.setUser(u);
+                        }
+                    }
+                });
+
+            }
+        });
+
+
+    }
+    void createNewUser(final User u){
+        User.createAccount(u.getEmail(), u.getUsername(), new OnRunTaskListener() {
+            @Override
+            public void OnStart() {
+
+            }
+
+            @Override
+            public void OnComplete(Task<?> task) {
+                User nUser;
+                if(task.isComplete()){
+                    nUser = User.cloneUser(u);
+
+                    nUser.setUID(mAuth.getCurrentUser().getUid());
+                    nUser.Save();
+                    DomainController.setUser(nUser);
+                }
+
+            }
+        });
+    }
+
+    void setRadnomImageUri(final User u){
+        int num = TestFunctions.randBetween(1,36);
+        File avatarFile = new File(Environment.getExternalStorageDirectory() + "/Avatar/" + num +".png");
+        Log.i("beforeScan", avatarFile.getPath());
+        MediaScannerConnection.scanFile(this,
+                new String[] { avatarFile.getAbsolutePath() }, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("onScanCompleted", uri.getPath());
+                        boolean fileSelected = u.UpadatePicture(uri, new OnUploadDataListener() {
+                            @Override
+                            public void onStart() {
+
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(MainActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void onFailed(Exception e) {
+                                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        if (!fileSelected)
+                            Toast.makeText(MainActivity.this, "No file selected", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+    void getUsersIDs(final OnGetObjectListener listener) {
+        if (UserIds == null) {
+            UserIds = new ArrayList<>();
+            DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+            db.child(Constants.UsersNode).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren())
+                        UserIds.add(ds.getKey());
+                    listener.OnSuccess(UserIds);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+        else
+            listener.OnSuccess(null);
+    }
+    List<String> getRandomIds(String UserId){
+        List<String> list= new ArrayList<>();
+        for(int i=0; i<10;i++) {
+            int index= TestFunctions.randBetween(0,UserIds.size()-1);
+            if(!UserId.equals(UserIds.get(index)))
+                list.add(UserIds.get(index));
+        }
+
+        return list;
     }
 }

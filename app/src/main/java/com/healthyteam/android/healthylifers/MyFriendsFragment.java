@@ -38,6 +38,7 @@ public class MyFriendsFragment extends Fragment {
     private Button dialogBtnNo;
     private static MyFriendsFragment instance;
     private MyFriendAdapter adapter;
+    OnGetListListener listListener;
 
     public static MyFriendsFragment getInstance(){
         if(instance==null)
@@ -48,7 +49,11 @@ public class MyFriendsFragment extends Fragment {
     @Override
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        if(fragment_layout==null)
+            initialize(inflater,container);
+        return fragment_layout;
+    }
+    void initialize(LayoutInflater inflater,ViewGroup container){
         fragment_layout = inflater.inflate(R.layout.fragment_my_friends,container,false);
         lvFriends = fragment_layout.findViewById(R.id.ListView_Friends);
         fabAddFriend = fragment_layout.findViewById(R.id.floatingActionButton_addFriend);
@@ -81,6 +86,7 @@ public class MyFriendsFragment extends Fragment {
                 addFriendDialog.cancel();
             }
         });
+
         dialogBtnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,10 +94,13 @@ public class MyFriendsFragment extends Fragment {
             }
         });
         adapter = new MyFriendAdapter();
-        //TODO: test this. Check list initialisation
-        DomainController.getUser().addGetFriendListener(new OnGetListListener() {
+        listListener =new OnGetListListener() {
             @Override
             public void onChildAdded(List<?> list, int index) {
+                if(lvFriends.getAdapter()==null) {
+                    adapter.setFriends((List<User>) list);
+                    lvFriends.setAdapter(adapter);
+                }
                 adapter.notifyDataSetChanged();
             }
 
@@ -102,7 +111,7 @@ public class MyFriendsFragment extends Fragment {
 
             @Override
             public void onChildRemove(List<?> list, int index,Object removedObject) {
-               adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -112,18 +121,19 @@ public class MyFriendsFragment extends Fragment {
 
             @Override
             public void onListLoaded(List<?> list) {
-                adapter.setFriends((List<User>) list);
-                lvFriends.setAdapter(adapter);
+                if(lvFriends.getAdapter()==null) {
+                    adapter.setFriends((List<User>) list);
+                    lvFriends.setAdapter(adapter);
+                }
             }
 
             @Override
             public void onCanclled(DatabaseError error) {
 
-            }
-        });
+            }};
+        //TODO: test this. Check list initialisation
+        DomainController.getUser().addGetFriendListener(listListener);
 
-
-        return fragment_layout;
     }
 
     public class MyFriendAdapter extends BaseAdapter {

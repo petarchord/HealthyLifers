@@ -33,13 +33,23 @@ public class WorldScoreFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if(layout_fragment==null)
+            initialize(inflater,container);
+        return layout_fragment;
+    }
+    void initialize(LayoutInflater inflater,ViewGroup container){
         layout_fragment = inflater.inflate(R.layout.fragment_world_score,container,false);
         listWorldScore = (ListView) layout_fragment.findViewById(R.id.ListView_worldScore);
         final WorldScoreAdapter adapter = new WorldScoreAdapter();
         DomainController.addGetWorldScoreListeners(new OnGetListListener() {
             @Override
             public void onChildAdded(List<?> list, int index) {
-                adapter.notifyDataSetChanged();
+                if(listWorldScore.getAdapter()==null) {
+                    adapter.setWorldUser((List<User>) list);
+                    listWorldScore.setAdapter(adapter);
+                }
+                else
+                    adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -59,8 +69,11 @@ public class WorldScoreFragment extends Fragment {
 
             @Override
             public void onListLoaded(List<?> list) {
-                adapter.setWorldUser((List<User>) list);
-                listWorldScore.setAdapter(adapter);
+                if(listWorldScore.getAdapter()==null) {
+                    adapter.setWorldUser((List<User>) list);
+                    listWorldScore.setAdapter(adapter);
+                }
+
             }
 
             @Override
@@ -68,11 +81,7 @@ public class WorldScoreFragment extends Fragment {
 
             }
         });
-
-
-        return layout_fragment;
     }
-
     public class WorldScoreAdapter extends BaseAdapter {
         List<User> WorldUsers;
 

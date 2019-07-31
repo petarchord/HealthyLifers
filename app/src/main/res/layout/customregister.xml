@@ -44,23 +44,23 @@
         >
 
 
-        <android.support.v7.widget.AppCompatTextView
+       <!-- <android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Email:"
             android:textColor="@color/colorSignInText"
             android:textSize="20dp"
             android:layout_marginLeft="15dp"
-            />
+            /> -->
 
         <android.support.v7.widget.AppCompatEditText
             android:id="@+id/editTextEmailRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter your email..."
-            android:textSize="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
+            android:textSize="17dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:background="@color/colorSignInButtons"
             android:padding="6dp"
             />
@@ -78,23 +78,23 @@
         >
 
 
-        <android.support.v7.widget.AppCompatTextView
+      <!--  <android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Name:"
             android:textColor="@color/colorSignInText"
             android:textSize="20dp"
             android:layout_marginLeft="15dp"
-            />
+            />-->
 
         <android.support.v7.widget.AppCompatEditText
             android:id="@+id/editTextNameRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter your name..."
-            android:textSize="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
+            android:textSize="17dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:background="@color/colorSignInButtons"
             android:padding="6dp"
             />
@@ -112,23 +112,23 @@
         >
 
 
-        <android.support.v7.widget.AppCompatTextView
+        <!--<android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Surname:"
             android:textColor="@color/colorSignInText"
             android:textSize="20dp"
             android:layout_marginLeft="15dp"
-            />
+            />-->
 
         <android.support.v7.widget.AppCompatEditText
             android:id="@+id/editTextSurnameRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter your surname..."
-            android:textSize="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
+            android:textSize="17dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:background="@color/colorSignInButtons"
             android:padding="6dp"
             />
@@ -146,23 +146,23 @@
         >
 
 
-        <android.support.v7.widget.AppCompatTextView
+     <!--   <android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Username:"
             android:textColor="@color/colorSignInText"
             android:textSize="20dp"
             android:layout_marginLeft="15dp"
-            />
+            />-->
 
         <android.support.v7.widget.AppCompatEditText
             android:id="@+id/editTextUsernameRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter your username..."
-            android:textSize="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
+            android:textSize="17dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:background="@color/colorSignInButtons"
             android:padding="6dp"
             />
@@ -179,14 +179,14 @@
         >
 
 
-        <android.support.v7.widget.AppCompatTextView
+     <!--   <android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Password:"
             android:textColor="@color/colorSignInText"
             android:textSize="20dp"
             android:layout_marginLeft="15dp"
-            />
+            />-->
 
         <android.support.v7.widget.AppCompatEditText
             android:inputType="textPassword"
@@ -194,9 +194,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter your password..."
-            android:textSize="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
+            android:textSize="17dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:background="@color/colorSignInButtons"
             android:padding="6dp"
             />
@@ -214,7 +214,7 @@
         >
 
 
-        <android.support.v7.widget.AppCompatTextView
+   <!--     <android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Repeat:"
@@ -222,16 +222,16 @@
             android:textSize="20dp"
             android:layout_marginLeft="15dp"
             />
-
+-->
         <android.support.v7.widget.AppCompatEditText
             android:inputType="textPassword"
             android:id="@+id/editTextPassRepeatRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Repeat your password..."
-            android:textSize="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
+            android:textSize="17dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:background="@color/colorSignInButtons"
             android:padding="6dp"
             />

@@ -147,6 +147,7 @@ public class MyProfileFragment extends Fragment {
                 openFileChooser();
             }
         });
+        //TODO: change this with camera access function
         btnTakePic.setOnClickListener(new View.OnClickListener() {
                                           @Override
                                           public void onClick(View v) {

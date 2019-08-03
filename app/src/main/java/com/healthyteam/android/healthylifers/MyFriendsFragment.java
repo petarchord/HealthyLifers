@@ -34,6 +34,7 @@ import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.User;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import org.w3c.dom.Text;
@@ -97,7 +98,7 @@ public class MyFriendsFragment extends Fragment {
         /*dialogBtnOk = addFriendDialog.findViewById(R.id.button_okDAF);
         dialogBtnCancel=addFriendDialog.findViewById(R.id.button_cancelDAF);*/
 
-        mBlueAdapter = BluetoothAdapter.getDefaultAdapter();
+      mBlueAdapter = BluetoothAdapter.getDefaultAdapter();
         devicesArray = new ArrayList<>();
 
         mReciever = new BroadcastReceiver() {
@@ -159,6 +160,9 @@ public class MyFriendsFragment extends Fragment {
                 addFriendDialog.cancel();
             }
         });*/
+        adapterAddFriends = new BluetoothItemsAdapter();
+
+
         adapter = new MyFriendAdapter();
         listListener =new OnGetListListener() {
             @Override
@@ -199,9 +203,9 @@ public class MyFriendsFragment extends Fragment {
             }};
         //TODO: test this. Check list initialisation
         DomainController.getUser().addGetFriendListener(listListener);
-        adapterAddFriends = new BluetoothItemsAdapter();
 
-        lvFriends.setAdapter(adapter);
+
+
         lvAddFriends.setAdapter(adapterAddFriends);
 
     }
@@ -209,7 +213,8 @@ public class MyFriendsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getContext().unregisterReceiver(mReciever);
+        //TODO: zakomentarisano ispod. Reciver se jednom registruje, a odjavljuje pri svakom gasenju fragmenta,zbog cega program puca. Potrebno promeniti
+ //       getContext().unregisterReceiver(mReciever);
         mBlueAdapter.cancelDiscovery();
     }
 
@@ -244,8 +249,14 @@ public class MyFriendsFragment extends Fragment {
             Button btnDelete= view.findViewById(R.id.button_deleteFriend);
             ImageView imageProfile = (ImageView) view.findViewById(R.id.imageView_ProfilePic);
 
-            imageProfile.setImageResource(R.drawable.profile_picture);
+
+
             final User friend = friends.get(i);
+            if(friend.getImageUrl()!=null) {
+                Picasso.get().load(friend.getImageUrl()).into(imageProfile);
+            }
+            else
+                imageProfile.setImageResource(R.drawable.profile_picture);
             String NameSurname = friend.getName() + " " + friend.getSurname();
             txtName.setText(NameSurname);
             txtUsername.setText(friend.getUsername());

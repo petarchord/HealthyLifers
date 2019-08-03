@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.healthyteam.android.healthylifers.Domain.Location;
 import com.healthyteam.android.healthylifers.Domain.User;
+import com.squareup.picasso.Picasso;
 
 public class FriendProfileFragment extends Fragment {
     private User friend;
@@ -40,8 +41,11 @@ public class FriendProfileFragment extends Fragment {
         imgFriendPic= fragment_layout.findViewById(R.id.imageView_ProfilePicFP);
         btnExit=fragment_layout.findViewById(R.id.btnExitFP);
         lvPosts = (ListView) fragment_layout.findViewById(R.id.ListView_PostFP);
-
-        imgFriendPic.setImageResource(R.drawable.profile_picture);
+        if(friend.getImageUrl()!=null) {
+            Picasso.get().load(friend.getImageUrl()).into(imgFriendPic);
+        }
+        else
+            imgFriendPic.setImageResource(R.drawable.profile_picture);
         String NameSurname= friend.getName() + " " + friend.getSurname();
         txtFriendNameSurname.setText(NameSurname);
         txtFriendUsername.setText(friend.getUsername());

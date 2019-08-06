@@ -45,9 +45,9 @@ public class DomainController {
         if(neighborListeners==null)
             neighborListeners=new ArrayList<>();
         neighborListeners.add(listener);
-        getNeighbors();
+        getNeighbors(listener);
     }
-    private static void getNeighbors(){
+    private static void getNeighbors(OnGetListListener listener){
         if(Neighbors ==null) {
             Neighbors = new ArrayList<>();
             Query query = getDatabase().child(Constants.UsersNode)
@@ -55,9 +55,12 @@ public class DomainController {
             query.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    UserLocationData u;
-                    u = dataSnapshot.getValue(UserLocationData.class);
+                    UserLocationData u=new UserLocationData();
+                    User user= new User();
+                    user.setData(dataSnapshot.getValue(UserData.class));
                     u.setUID(dataSnapshot.getKey());
+                    u.setLongitude(user.getLongitude());
+                    u.setLatitude(user.getLatitude());
                     Neighbors.add(u);
                     for (OnGetListListener listener : neighborListeners)
                         listener.onChildAdded(Neighbors, Neighbors.size() - 1);
@@ -105,8 +108,7 @@ public class DomainController {
             });
         }
         else
-            for (OnGetListListener listener : neighborListeners)
-                listener.onListLoaded(Neighbors);
+            listener.onListLoaded(Neighbors);
     }
     public static void addGetWorldScoreListeners(OnGetListListener listener){
         if(worldScoreListeners==null)
@@ -121,7 +123,7 @@ public class DomainController {
         return WorldScoreUsers;
 
     }
-    public static void getWorldScoreUsersDB(){
+    private static void getWorldScoreUsersDB(){
         if(WorldScoreUsers ==null) {
 
             WorldScoreUsers = new ArrayList<>();

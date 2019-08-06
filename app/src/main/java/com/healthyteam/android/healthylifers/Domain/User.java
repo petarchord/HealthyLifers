@@ -242,14 +242,20 @@ public class User implements  DBReference{
         }
         return -1;
     }
-
+    public User getFriendByUid(String uid){
+        int index = getFriendIndex(uid);
+        if(index!=-1)
+            return friendList.get(index);
+        return null;
+    }
     public void addGetFriendListener(OnGetListListener listener){
         if(friendListeners==null)
             friendListeners=new ArrayList<>();
-        friendListeners.add(listener);
-        getFriendList();
+        if(!friendListeners.contains(listener))
+            friendListeners.add(listener);
+        getFriendList(listener);
     }
-    private void getFriendList() {
+    private void getFriendList(final OnGetListListener listener) {
         if(friendList==null){
             friendList=new ArrayList<>();
             for(final String friendId:this.getFriendsIds())
@@ -278,8 +284,7 @@ public class User implements  DBReference{
             }
         }
         else
-            for(OnGetListListener listener:friendListeners)
-                listener.onListLoaded(friendList);
+            listener.onListLoaded(friendList);
     }
     public void addFriend(String uid){
         data.FriendsIds.add(uid);
@@ -364,7 +369,7 @@ public class User implements  DBReference{
             }
         });
     }
-    public boolean UpadatePicture(final Uri ImageUri, final OnUploadDataListener listener ) {
+    public boolean UpdatePicture(final Uri ImageUri, final OnUploadDataListener listener ) {
         listener.onStart();
         if (ImageUri != null) {
             StorageReference fileReference = FirebaseStorage.getInstance().

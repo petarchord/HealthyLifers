@@ -1,32 +1,26 @@
 package com.healthyteam.android.healthylifers;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,9 +31,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
@@ -47,8 +39,10 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.healthyteam.android.healthylifers.Domain.Builder;
-import com.healthyteam.android.healthylifers.Domain.LocationBuilder;
+import com.google.firebase.database.DatabaseError;
+import com.healthyteam.android.healthylifers.Data.UserLocationData;
+import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.User;
 import com.karumi.dexter.BuildConfig;
 
@@ -56,24 +50,26 @@ import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
 
-public class MapFragment extends Fragment {
+
+public class MapFragment extends Fragment{
     private  static final String TAG = "Location Service: ";
     private static final int REQUEST_CHECK_SETTINGS = 100;
     private static final String PROVIDER_STRING ="provider";
 
-    private View layour_fragment;
+    private View layout_fragment;
     private FloatingActionButton fabAddLocation;
     private Context context;
     private MapView map=null;
@@ -88,6 +84,7 @@ public class MapFragment extends Fragment {
     // bunch of location related apis
     private FusedLocationProviderClient mFusedLocationClient;
     private SettingsClient mSettingsClient;
+
     private Location currLocation;
     private Double currZoom=null;
     private LocationSettingsRequest mLocationSettingsRequest;
@@ -95,19 +92,24 @@ public class MapFragment extends Fragment {
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private SectionsPageAdapter mSectionPageAdapter;
-
+    private OnGetListListener getNeighborListener;
     private boolean addPlace = false;
-
     private static MapFragment instance;
-
+    //TODO: add center button
+    //TODO: on friend marker click open friend profile
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Initialize(inflater,container);
+        return layout_fragment;
+
+    }
+    private void Initialize(@NonNull LayoutInflater inflater, @Nullable ViewGroup container){
         context=getContext();
-        layour_fragment =  inflater.inflate(R.layout.fragment_map,container,false);
-        fabAddLocation = layour_fragment.findViewById(R.id.floatingActionButton_addLocation);
+        layout_fragment =  inflater.inflate(R.layout.fragment_map,container,false);
+        fabAddLocation = layout_fragment.findViewById(R.id.floatingActionButton_addLocation);
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        map = layour_fragment.findViewById(R.id.MapView);
+        map = layout_fragment.findViewById(R.id.MapView);
         initMap();
         setLocationSettings();
         setAddLocationListener();
@@ -141,9 +143,39 @@ public class MapFragment extends Fragment {
 
             }
         });
-        return layour_fragment;
-    }
+        DomainController.getUser().addGetFriendListener(new OnGetListListener() {
+            @Override
+            public void onChildAdded(List<?> list, int index) {
 
+            }
+
+            @Override
+            public void onChildChange(List<?> list, int index) {
+
+            }
+
+            @Override
+            public void onChildRemove(List<?> list, int index, Object removedObject) {
+
+            }
+
+            @Override
+            public void onChildMoved(List<?> list, int index) {
+
+            }
+            //TODO: fix memory leak
+            @Override
+            public void onListLoaded(List<?> list) {
+                    DomainController.addGetNeigborsListener(new NeighbourEventHandler());
+            }
+
+            @Override
+            public void onCanclled(DatabaseError error) {
+
+            }
+        });
+
+    }
 
     public void setUpViewPager(ViewPager viewPager)
     {
@@ -213,7 +245,7 @@ public class MapFragment extends Fragment {
             instance=new MapFragment();
         return instance;
     }
-
+    //TODO: check map initialization: zoom, positioning...
     private void initMap(){
         Context ctx = context.getApplicationContext();
         mapController = map.getController();
@@ -349,6 +381,21 @@ public class MapFragment extends Fragment {
         MapEventsOverlay OverlayEvents = new MapEventsOverlay(context,mRecive);
         map.getOverlays().add(OverlayEvents);
     }
+    //TODO: transfor url to drawable
+    public static Drawable drawableFromUrl(String url) throws IOException {
+        Bitmap x;
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.connect();
+        InputStream input = connection.getInputStream();
+
+        x = BitmapFactory.decodeStream(input);
+        return new BitmapDrawable(Resources.getSystem(), x);
+    }
+    private Drawable resize(Drawable image) {
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
+        return new BitmapDrawable(getResources(), bitmapResized);
+    }
     private void setTestMarker( GeoPoint p){
         Marker likeMarker = new Marker(map);
         likeMarker.setPosition(p);
@@ -368,8 +415,65 @@ public class MapFragment extends Fragment {
 
 
     }
+    //TODO: make better structured code. Add user name below profil image
+    //TODO: implement on ListLoaded method
+    class NeighbourEventHandler implements OnGetListListener {
+        @Override
+        public void onChildAdded(List<?> list, int index) {
+            UserLocationData user = (UserLocationData) list.get(index);
+            Marker userMarker = new Marker(map);
+            GeoPoint p = new GeoPoint(user.getLatitude(), user.getLongitude());
+            userMarker.setPosition(p);
+            User friend = DomainController.getUser().getFriendByUid(user.getUID());
+            if (friend != null) {
+                try {
+                    userMarker.setIcon(drawableFromUrl(friend.getImageUrl()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-     //function should recive Location parametar in the future
+            } else
+                userMarker.setIcon(getResources().getDrawable(R.drawable.profile_picture));
+            userMarker.setIcon(resize(userMarker.getIcon()));
+            //onClick initialize showLocation dialog with Location object then show dialog
+            userMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+                    Toast.makeText(context, marker.getPosition().getLatitude() + " - " + marker.getPosition().getLongitude(), Toast.LENGTH_LONG).show();
+                    Log.println(Log.INFO, "Map", "latitude: " + marker.getPosition().getLatitude() + ", "
+                            + "longitude: " + marker.getPosition().getLongitude());
+                    return true;
+                }
+            });
+            map.getOverlays().add(userMarker);
+        }
+
+        @Override
+        public void onChildChange(List<?> list, int index) {
+
+        }
+
+        @Override
+        public void onChildRemove(List<?> list, int index, Object removedObject) {
+
+        }
+
+        @Override
+        public void onChildMoved(List<?> list, int index) {
+
+        }
+
+        @Override
+        public void onListLoaded(List<?> list) {
+
+        }
+
+        @Override
+        public void onCanclled(DatabaseError error) {
+
+        }
+    }
+    //function should recive Location parametar in the future
 
 
 

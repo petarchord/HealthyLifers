@@ -201,10 +201,7 @@ public class MyFriendsFragment extends Fragment {
             public void onCanclled(DatabaseError error) {
 
             }};
-        //TODO: test this. Check list initialisation
         DomainController.getUser().addGetFriendListener(listListener);
-
-
 
         lvAddFriends.setAdapter(adapterAddFriends);
 

@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -21,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
@@ -37,7 +35,6 @@ import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
 import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Domain.Constants;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
-import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.OnGetObjectListener;
 import com.healthyteam.android.healthylifers.Domain.TestFunctions;
 import com.healthyteam.android.healthylifers.Domain.User;
@@ -99,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //should call from SignIn Activity
@@ -116,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
          //region test
         TestFunctions.setContext(this);
         final User u = TestFunctions.createUser();
-        User.signIn(u.getEmail(), u.getUsername(), new OnRunTaskListener() {
+        User.signIn("test14@test.com", "test0014", new OnRunTaskListener() {
             @Override
             public void OnStart() {
 
@@ -124,17 +121,26 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void OnComplete(Task<?> task) {
-                if(task.isComplete()){
+                if(task.isSuccessful()){
                     User.getUser(mAuth.getCurrentUser().getUid(), new OnGetObjectListener() {
                         @Override
                         public void OnSuccess(Object o) {
                             DomainController.setUser((User) o);
+                            if (savedInstanceState == null) {
+                                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                                        MapFragment.getInstance()).commit();
+                            }
                         }
                     });
                 }
                 else{
+                    //TODO: error message
+                    //below is test region
                     createNewUser(u);
                     DomainController.setUser(u);
+                    if (savedInstanceState == null) {
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                                MapFragment.getInstance()).commit();}
                 }
             }
         });
@@ -194,10 +200,8 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         //added this if statement to keep the selected fragment when rotating the device
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    MapFragment.getInstance()).commit();
-        }
+
+
     }
 
 
@@ -328,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
                 new MediaScannerConnection.OnScanCompletedListener() {
                     public void onScanCompleted(String path, Uri uri) {
                         Log.i("onScanCompleted", uri.getPath());
-                        boolean fileSelected = u.UpadatePicture(uri, new OnUploadDataListener() {
+                        boolean fileSelected = u.UpdatePicture(uri, new OnUploadDataListener() {
                             @Override
                             public void onStart() {
 

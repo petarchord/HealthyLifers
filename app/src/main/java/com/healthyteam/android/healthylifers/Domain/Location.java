@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-
+//TODO: make TODO task. Figure out basic structure
 public class Location {
     public static enum Category {
         EVENT, HEALTHYFOOD, COURT, FITNESSCENTER

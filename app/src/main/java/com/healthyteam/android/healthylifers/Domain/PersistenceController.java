@@ -13,7 +13,6 @@ public class PersistenceController {
         //get user from database
         return TestFunctions.createFriendList();
     }
-    //TODO: create function that get users from database and sort them
     //below is test funciton
     public static List<User> getWorldUsers(){
         //get user for presentation from database

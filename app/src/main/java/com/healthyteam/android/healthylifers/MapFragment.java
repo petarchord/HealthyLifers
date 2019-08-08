@@ -10,11 +10,14 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -61,16 +64,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
-public class MapFragment extends Fragment{
+public class MapFragment extends Fragment {
     private  static final String TAG = "Location Service: ";
     private static final int REQUEST_CHECK_SETTINGS = 100;
     private static final String PROVIDER_STRING ="provider";
 
     private View layout_fragment;
     private FloatingActionButton fabAddLocation;
+    private FloatingActionButton fabCenterLocation;
     private Context context;
     private MapView map=null;
     private IMapController mapController=null;
@@ -95,12 +104,14 @@ public class MapFragment extends Fragment{
     private OnGetListListener getNeighborListener;
     private boolean addPlace = false;
     private static MapFragment instance;
-    //TODO: add center button
-    //TODO: on friend marker click open friend profile
+    private List<Marker> UserMarkerList;
+    //TODO:
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Initialize(inflater,container);
+
+
         return layout_fragment;
 
     }
@@ -108,6 +119,7 @@ public class MapFragment extends Fragment{
         context=getContext();
         layout_fragment =  inflater.inflate(R.layout.fragment_map,container,false);
         fabAddLocation = layout_fragment.findViewById(R.id.floatingActionButton_addLocation);
+        fabCenterLocation = layout_fragment.findViewById(R.id.floatingActionButton_centerLocation);
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         map = layout_fragment.findViewById(R.id.MapView);
         initMap();
@@ -115,8 +127,6 @@ public class MapFragment extends Fragment{
         setAddLocationListener();
 
         mSectionPageAdapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
-
-
 
         addItemDialog = new Dialog(getContext());
         addItemDialog.setContentView(R.layout.dialog_add_item);
@@ -133,14 +143,15 @@ public class MapFragment extends Fragment{
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(addPlace){
-                    pickLocationOptionOff();
-                    return;
-                }
-                pickLocationOptionOn();
-//                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//                addItemDialog.show();
+                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                addItemDialog.show();
 
+            }
+        });
+        fabCenterLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                centerUserLocation();
             }
         });
         DomainController.getUser().addGetFriendListener(new OnGetListListener() {
@@ -245,7 +256,6 @@ public class MapFragment extends Fragment{
             instance=new MapFragment();
         return instance;
     }
-    //TODO: check map initialization: zoom, positioning...
     private void initMap(){
         Context ctx = context.getApplicationContext();
         mapController = map.getController();
@@ -256,7 +266,6 @@ public class MapFragment extends Fragment{
         setMyLocationOverlay();
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
         if(currZoom==null) {
-            mapController.setZoom(5.0);
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                 mapController.setZoom(15.0);
         }
@@ -310,35 +319,15 @@ public class MapFragment extends Fragment{
                     }
                 });
     }
-    //permission will be checked in SignIn activity
-    private Location getLocationFromDevice(){
-        Location gpsLocation=null;
-        Location networkLocation=null;
-        boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean netEnabled=locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        if(gpsEnabled)
-            gpsLocation=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(netEnabled)
-            networkLocation= locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        try{
-            if(gpsLocation.getAccuracy()>networkLocation.getAccuracy())
-                return networkLocation;
-            else
-                return gpsLocation;
-        }
-        catch (NullPointerException e){
-            if(networkLocation!=null)
-                return networkLocation;
-            return gpsLocation;
-        }
-    }
     private void updateLocationUI() {
-        if (currLocation == null)
-            currLocation = getLocationFromDevice();//ovo verovatno treba da se izbrise. Za sad nema funkciju
+        if (currLocation == null){
+            User user = DomainController.getUser();
+            mapController.setCenter(new GeoPoint(user.getLatitude(),user.getLongitude()));
+            }
         if (currLocation != null) {
             mapController.setCenter(new GeoPoint(currLocation.getLatitude(), currLocation.getLongitude()));
-            if(currZoom!=null)
+            if (currZoom != null)
                 mapController.setZoom(currZoom);
         }
     }
@@ -353,9 +342,11 @@ public class MapFragment extends Fragment{
 
         if(currLocation!=null)
             updateLocationUI();
-        else
-            myLocationOverlay.enableFollowLocation();
+        else {
 
+            myLocationOverlay.enableFollowLocation();
+            updateLocationUI();
+        }
         map.getOverlays().add(this.myLocationOverlay);
     }
     private void setAddLocationListener(){
@@ -381,27 +372,14 @@ public class MapFragment extends Fragment{
         MapEventsOverlay OverlayEvents = new MapEventsOverlay(context,mRecive);
         map.getOverlays().add(OverlayEvents);
     }
-    //TODO: transfor url to drawable
-    public static Drawable drawableFromUrl(String url) throws IOException {
-        Bitmap x;
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.connect();
-        InputStream input = connection.getInputStream();
 
-        x = BitmapFactory.decodeStream(input);
-        return new BitmapDrawable(Resources.getSystem(), x);
-    }
-    private Drawable resize(Drawable image) {
-        Bitmap b = ((BitmapDrawable)image).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
-        return new BitmapDrawable(getResources(), bitmapResized);
-    }
+
     private void setTestMarker( GeoPoint p){
         Marker likeMarker = new Marker(map);
         likeMarker.setPosition(p);
-        //marker depend of location category
         likeMarker.setIcon(getResources().getDrawable(R.drawable.baseline_thumb_up_24_green));
-        //onClick initialize showLocation dialog with Location object then show dialog
+
+
         likeMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
@@ -412,19 +390,37 @@ public class MapFragment extends Fragment{
             }
         });
         map.getOverlays().add(likeMarker);
+        Marker textMarker = new Marker(map);
+        textMarker.setPosition(p);
+        textMarker.setTextIcon("TEXT");
+        textMarker.setAnchor(0,(float)0);
+        map.getOverlays().add(textMarker);
 
 
     }
-    //TODO: make better structured code. Add user name below profil image
-    //TODO: implement on ListLoaded method
+
     class NeighbourEventHandler implements OnGetListListener {
-        @Override
-        public void onChildAdded(List<?> list, int index) {
-            UserLocationData user = (UserLocationData) list.get(index);
+        private Drawable drawableFromUrl(String urlStr) throws IOException {
+            Bitmap x;
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            URL url = new URL(urlStr);
+            x = BitmapFactory.decodeStream((InputStream)url.getContent());
+            return new BitmapDrawable(Resources.getSystem(), x);
+        }
+        private Drawable resize(Drawable image) {
+            Bitmap b = ((BitmapDrawable)image).getBitmap();
+            Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
+            return new BitmapDrawable(getResources(), bitmapResized);
+        }
+        private void setUserMarker(UserLocationData user){
+            if(UserMarkerList == null)
+                UserMarkerList=new LinkedList<Marker>();
             Marker userMarker = new Marker(map);
+            Marker textMarker = new Marker(map);
             GeoPoint p = new GeoPoint(user.getLatitude(), user.getLongitude());
             userMarker.setPosition(p);
-            User friend = DomainController.getUser().getFriendByUid(user.getUID());
+            final User friend = DomainController.getUser().getFriendByUid(user.getUID());
             if (friend != null) {
                 try {
                     userMarker.setIcon(drawableFromUrl(friend.getImageUrl()));
@@ -435,17 +431,38 @@ public class MapFragment extends Fragment{
             } else
                 userMarker.setIcon(getResources().getDrawable(R.drawable.profile_picture));
             userMarker.setIcon(resize(userMarker.getIcon()));
-            //onClick initialize showLocation dialog with Location object then show dialog
-            userMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    Toast.makeText(context, marker.getPosition().getLatitude() + " - " + marker.getPosition().getLongitude(), Toast.LENGTH_LONG).show();
-                    Log.println(Log.INFO, "Map", "latitude: " + marker.getPosition().getLatitude() + ", "
-                            + "longitude: " + marker.getPosition().getLongitude());
-                    return true;
-                }
-            });
+            if(friend!=null) {
+                userMarker.setAnchor(0, 1);
+                userMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+                        FriendProfileFragment FriendProfile = new FriendProfileFragment();
+                        FriendProfile.setFriend(friend);
+                        FriendProfile.setPerent(MapFragment.getInstance());
+                        ((MainActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,FriendProfile).commit();
+                        return true;
+                    }
+                });
+            }
+            else
+                userMarker.setAnchor(0,(float)0.4);
+            userMarker.setInfoWindow(null);
+            userMarker.setPanToView(false);
+
+            textMarker.setPosition(p);
+            textMarker.setTextIcon(user.getUsername());
+            textMarker.setInfoWindow(null);
+            textMarker.setPanToView(false);
+            textMarker.setAnchor(0,0);
             map.getOverlays().add(userMarker);
+            map.getOverlays().add(textMarker);
+
+        }
+        @Override
+        public void onChildAdded(List<?> list, int index) {
+            UserLocationData user = (UserLocationData) list.get(index);
+            setUserMarker(user);
+
         }
 
         @Override
@@ -465,7 +482,8 @@ public class MapFragment extends Fragment{
 
         @Override
         public void onListLoaded(List<?> list) {
-
+            for(UserLocationData user: (List<UserLocationData>) list)
+                setUserMarker(user);
         }
 
         @Override

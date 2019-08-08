@@ -26,7 +26,11 @@ public class FriendProfileFragment extends Fragment {
     private ImageView imgFriendPic;
     private ListView lvPosts;
     private ImageButton btnExit;
+    private Fragment perent;
 
+    public void setPerent(Fragment perent){
+        this.perent=perent;
+    }
     public void setFriend(User u){
         this.friend=u;
     }
@@ -54,7 +58,7 @@ public class FriendProfileFragment extends Fragment {
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,MyFriendsFragment.getInstance()).commit();
+                ((MainActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,perent).commit();
             }
         });
         FriendProfileFragment.PlaceItemAdapter adapter = new FriendProfileFragment.PlaceItemAdapter();

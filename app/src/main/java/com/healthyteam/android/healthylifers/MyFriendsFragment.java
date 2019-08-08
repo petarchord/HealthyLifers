@@ -264,6 +264,7 @@ public class MyFriendsFragment extends Fragment {
                 public void onClick(View v) {
                     FriendProfileFragment FriendProfile = new FriendProfileFragment();
                     FriendProfile.setFriend(friend);
+                    FriendProfile.setPerent(MyFriendsFragment.getInstance());
                     ((MainActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,FriendProfile).commit();
                 }
             });

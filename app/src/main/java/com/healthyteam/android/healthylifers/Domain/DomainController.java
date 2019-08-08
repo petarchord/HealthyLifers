@@ -61,6 +61,7 @@ public class DomainController {
                     u.setUID(dataSnapshot.getKey());
                     u.setLongitude(user.getLongitude());
                     u.setLatitude(user.getLatitude());
+                    u.setUsername(user.getUsername());
                     Neighbors.add(u);
                     for (OnGetListListener listener : neighborListeners)
                         listener.onChildAdded(Neighbors, Neighbors.size() - 1);
@@ -68,8 +69,10 @@ public class DomainController {
 
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    UserLocationData u = dataSnapshot.getValue(UserLocationData.class);
-                    int uIndex = getUserIndex(u.getUID(), Neighbors);
+                    User u = new User();
+                    u.setData(dataSnapshot.getValue(UserData.class));
+                    String uid= dataSnapshot.getKey();
+                    int uIndex = getUserIndex(uid, Neighbors);
                     if (uIndex != -1) {
                         Neighbors.get(uIndex).setLatitude(u.getLatitude());
                         Neighbors.get(uIndex).setLongitude(u.getLongitude());
@@ -82,9 +85,10 @@ public class DomainController {
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    UserLocationData u = dataSnapshot.getValue(UserLocationData.class);
-                    int uIndex = getUserIndex(u.getUID(),Neighbors);
+                    String uid = dataSnapshot.getKey();
+                    int uIndex = getUserIndex(uid,Neighbors);
                     if (uIndex != -1) {
+                        UserLocationData u = Neighbors.get(uIndex);
                         Neighbors.remove(uIndex);
                         for (OnGetListListener listener : neighborListeners)
                             listener.onChildRemove(Neighbors, uIndex,u);

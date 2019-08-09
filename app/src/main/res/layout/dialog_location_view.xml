@@ -5,7 +5,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical" android:layout_width="350dp"
-        android:layout_height="600dp"
+        android:layout_height="800dp"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/add_item_window"
@@ -14,7 +14,7 @@
 
 
         <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/closeSignInForm"
+            android:id="@+id/closeLocationDialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/close_box_add_item"
@@ -116,12 +116,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="?"
-                android:textSize="35dp"
-                android:layout_marginLeft="20dp"
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#FFFFFF"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+
                 />
 
             <android.support.v7.widget.AppCompatTextView
@@ -132,42 +133,191 @@
                 android:layout_marginLeft="10dp"
                 />
 
-            <android.support.v7.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Remaining time:"
-                android:textSize="16dp"
-                android:textColor="#81312D"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="15dp"
-                />
-            <android.support.v7.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16dp"
-                android:textColor="#81312D"
-                android:text="1:42:14"
-                android:layout_marginTop="15dp"
-                />
+
         </LinearLayout>
 
 
-        <android.support.design.widget.TabLayout
-            android:layout_marginTop="20dp"
-            android:id="@+id/tabsLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-        </android.support.design.widget.TabLayout>
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewPagerLocation"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp">
 
-            >
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/info_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Info"
+                android:background="@color/common_google_signin_btn_text_dark_pressed"
+                android:layout_margin="10dp"
+                />
 
-        </android.support.v4.view.ViewPager>
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/comments_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comments"
+                android:background="@color/common_google_signin_btn_text_dark_disabled"
+                android:layout_margin="10dp"
+                />
+
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <LinearLayout
+                android:id="@+id/layout_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:orientation="vertical"
+                >
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="About location"
+                    android:textColor="@color/colorSignInText"
+                    android:textSize="25dp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location_desc"
+                    android:textColor="@color/colorSignInText"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="5dp"
+
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Category"
+                    android:textColor="@color/colorSignInText"
+                    android:textSize="25dp"
+                    android:textStyle="bold"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="40dp"
+
+                    />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/dumbbell"
+                        android:layout_marginLeft="20dp"
+                        />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/store"
+                        android:layout_marginLeft="10dp"
+                        />
+
+                </LinearLayout>
+
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tags"
+                    android:textColor="@color/colorSignInText"
+                    android:textSize="25dp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginLeft="10dp"
+
+
+                    />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="tennis , basketball , voleyball..."
+                    android:textColor="@color/colorSignInText"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+
+
+                    />
+
+            </LinearLayout>
+
+
+
+        </ScrollView>
+
+
+
+
+
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <LinearLayout
+                android:id="@+id/layout_comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                >
+
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/addCommentButton"
+                    android:layout_width="140dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/button_main"
+                    android:text="Add comment"
+                    android:textSize="14dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    />
+
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/comment_listView"
+
+                    >
+
+                </ListView>
+
+            </LinearLayout>
+
+
+
+        </ScrollView>
+
+
+
+
+
 
 
 

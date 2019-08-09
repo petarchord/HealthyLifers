@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -21,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
@@ -37,7 +35,6 @@ import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
 import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Domain.Constants;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
-import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.OnGetObjectListener;
 import com.healthyteam.android.healthylifers.Domain.TestFunctions;
 import com.healthyteam.android.healthylifers.Domain.User;
@@ -58,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private Dialog addItemDialog;
     private Dialog locationViewDialog;
     private ImageButton btnExit;
+    private Fragment searchFragment = null;
     private Fragment settingsFragment = null;
     private Fragment tabInfoFragment;
     private Fragment tabCommentsFragment;
@@ -65,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Button yesLogOut;
     private Button noLogOut;
+    private Button infoButton;
+    private Button commentsButton;
+    private Fragment activeFragment;
 
     private TabLayout tabLayout;
     private ViewPager mViewPager;
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void OnComplete(Task<?> task) {
-                if(task.isComplete()){
+                if(task.isSuccessful()){
                     User.getUser(mAuth.getCurrentUser().getUid(), new OnGetObjectListener() {
                         @Override
                         public void OnSuccess(Object o) {
@@ -150,11 +151,11 @@ public class MainActivity extends AppCompatActivity {
         locationViewDialog = new Dialog(this);
         locationViewDialog.setContentView(R.layout.dialog_location_view);
 
-        tabLayout = locationViewDialog.findViewById(R.id.tabsLocation);
-        mViewPager = locationViewDialog.findViewById(R.id.viewPagerLocation);
+        infoButton = locationViewDialog.findViewById(R.id.info_button);
+        commentsButton = locationViewDialog.findViewById(R.id.comments_button);
 
-        setUpViewPager(mViewPager);
-        tabLayout.setupWithViewPager(mViewPager);
+
+
 
 
 
@@ -166,6 +167,8 @@ public class MainActivity extends AppCompatActivity {
 
         logOutDialog = new Dialog(this);
         logOutDialog.setContentView(R.layout.dialog_log_out);
+
+
 
         yesLogOut = logOutDialog.findViewById(R.id.yesLogOut);
         noLogOut = logOutDialog.findViewById(R.id.noLogOut);
@@ -208,16 +211,6 @@ public class MainActivity extends AppCompatActivity {
       //  updateUI(null);
     }
 
-    public void setUpViewPager(ViewPager viewPager)
-    {
-        SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        tabInfoFragment = new Fragment();
-        tabCommentsFragment = new Fragment();
-        adapter.addFragment(tabInfoFragment,"TabInfoFragment");
-        adapter.addFragment(tabCommentsFragment,"TabCommentsFragment");
-        mViewPager.setAdapter(adapter);
-    }
-
 
 
     @Override
@@ -227,6 +220,19 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private Fragment getActiveFragment()
+    {
+        for(Fragment frag : getSupportFragmentManager().getFragments())
+        {
+            if(frag.isVisible())
+                return  frag;
+
+
+        }
+
+        return null;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -234,17 +240,26 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case R.id.app_bar_search:
-                Log.d("MyTag","Search clicked!");
-                locationViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                locationViewDialog.show();
+                if(searchFragment == null)
+                {
+                    activeFragment= getActiveFragment();
+                    searchFragment = new SearchFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_replace,searchFragment).commit();
+                }
+                else
+                {
+                    getSupportFragmentManager().beginTransaction().hide(searchFragment).commit();
+                    searchFragment=null;
+                }
 
                 break;
 
             case R.id.app_bar_settings:
                 if(settingsFragment == null)
                 {
+                    activeFragment = getActiveFragment();
                     settingsFragment = new SettingsFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,settingsFragment).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_replace,settingsFragment).commit();
 
                 }
                 else

@@ -25,6 +25,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
@@ -32,6 +33,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -82,8 +87,14 @@ public class MapFragment extends Fragment {
     MyLocationNewOverlay myLocationOverlay;
     private Dialog addItemDialog;
     private Dialog locationViewDialog;
+    private Dialog addCommentDialog;
+    private ImageButton closeCommentDialog;
     private Fragment tabInfoFragment;
     private Fragment tabCommentsFragment;
+    private Button infoButton;
+    private Button commentsButton;
+    private Button addCommentButton;
+    private ImageButton closeLocationView;
 
     // bunch of location related apis
     private FusedLocationProviderClient mFusedLocationClient;
@@ -94,7 +105,10 @@ public class MapFragment extends Fragment {
     private LocationRequest mLocationRequest;
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private ImageButton closeAddItem;
     private SectionsPageAdapter mSectionPageAdapter;
+    private LinearLayout layoutInfo;
+    private LinearLayout layoutComments;
 
     private boolean addPlace = false;
 
@@ -112,32 +126,94 @@ public class MapFragment extends Fragment {
         setLocationSettings();
         setAddLocationListener();
 
-        mSectionPageAdapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
+       // mSectionPageAdapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
 
 
 
         addItemDialog = new Dialog(getContext());
         addItemDialog.setContentView(R.layout.dialog_add_item);
 
-        locationViewDialog = new Dialog(getContext());
+        addCommentDialog = new Dialog(getContext());
+        addCommentDialog.setContentView(R.layout.dialog_add_comment);
+
+        closeCommentDialog = addCommentDialog.findViewById(R.id.closeCommentDialog);
+
+        closeAddItem = (ImageButton) addItemDialog.findViewById(R.id.closeAddItem);
+
+        locationViewDialog = new Dialog(context);
         locationViewDialog.setContentView(R.layout.dialog_location_view);
+        closeLocationView = locationViewDialog.findViewById(R.id.closeLocationDialog);
+        addCommentButton = locationViewDialog.findViewById(R.id.addCommentButton);
+        layoutInfo = locationViewDialog.findViewById(R.id.layout_info);
+        layoutComments = locationViewDialog.findViewById(R.id.layout_comments);
 
-        tabLayout = locationViewDialog.findViewById(R.id.tabsLocation);
-        viewPager = locationViewDialog.findViewById(R.id.viewPagerLocation);
 
-        setUpViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
+        infoButton = locationViewDialog.findViewById(R.id.info_button);
+        commentsButton = locationViewDialog.findViewById(R.id.comments_button);
+
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                commentsButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
+                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
+                layoutComments.setVisibility(View.GONE);
+                layoutComments.invalidate();
+                layoutInfo.setVisibility(View.VISIBLE);
+                layoutInfo.invalidate();
+
+            }
+        });
+
+        commentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                infoButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
+                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
+                layoutComments.setVisibility(View.VISIBLE);
+                layoutComments.invalidate();
+                layoutInfo.setVisibility(View.GONE);
+                layoutInfo.invalidate();
+
+            }
+        });
+
+        addCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCommentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                addCommentDialog.show();
+            }
+        });
+
+        closeLocationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locationViewDialog.dismiss();
+            }
+        });
+
+        closeCommentDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCommentDialog.dismiss();
+            }
+        });
+
+        closeAddItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addItemDialog.dismiss();
+            }
+        });
 
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(addPlace){
-                    pickLocationOptionOff();
-                    return;
-                }
-                pickLocationOptionOn();
-//                addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//                addItemDialog.show();
+
+
+              locationViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+              locationViewDialog.show();
 
             }
         });
@@ -145,15 +221,7 @@ public class MapFragment extends Fragment {
     }
 
 
-    public void setUpViewPager(ViewPager viewPager)
-    {
-        SectionsPageAdapter adapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
-        tabInfoFragment = new Fragment();
-        tabCommentsFragment = new Fragment();
-        adapter.addFragment(tabInfoFragment,"TabInfoFragment");
-        adapter.addFragment(tabCommentsFragment,"TabCommentsFragment");
-        viewPager.setAdapter(adapter);
-    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

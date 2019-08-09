@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="300dp"
+    android:layout_height="250dp"
+    android:layout_gravity="center"
+    android:background="@drawable/log_out_window"
+    >
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/closeCommentDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/close_box_add_item"
+        android:layout_gravity="right"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="30dp"
+        android:padding="0dp"
+        android:background="#000000"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <android.support.v7.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_margin="20dp"
+            android:hint="Write comment ..."
+            />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonPostComment"
+            android:text="Post"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@drawable/button_main"
+            android:layout_marginTop="10dp"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 public class TabCommentsFragment extends Fragment {
 
     private static final String TAG = "TabCommentsFragment";
+    private View view;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.tab_comments_fragment,container,false);
+        view = inflater.inflate(R.layout.tab_comments_fragment,container,false);
         return view;
     }
 }

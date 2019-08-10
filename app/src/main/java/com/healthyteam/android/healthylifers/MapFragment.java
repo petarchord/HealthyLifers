@@ -33,10 +33,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -53,6 +56,7 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.healthyteam.android.healthylifers.Domain.Builder;
+import com.healthyteam.android.healthylifers.Domain.Comment;
 import com.healthyteam.android.healthylifers.Domain.LocationBuilder;
 import com.healthyteam.android.healthylifers.Domain.User;
 import com.karumi.dexter.BuildConfig;
@@ -71,6 +75,8 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.util.ArrayList;
 
 
 public class MapFragment extends Fragment {
@@ -95,6 +101,8 @@ public class MapFragment extends Fragment {
     private Button commentsButton;
     private Button addCommentButton;
     private ImageButton closeLocationView;
+    private ListView commentListView;
+    private ArrayList<Comment> commentsArray;
 
     // bunch of location related apis
     private FusedLocationProviderClient mFusedLocationClient;
@@ -146,6 +154,9 @@ public class MapFragment extends Fragment {
         addCommentButton = locationViewDialog.findViewById(R.id.addCommentButton);
         layoutInfo = locationViewDialog.findViewById(R.id.layout_info);
         layoutComments = locationViewDialog.findViewById(R.id.layout_comments);
+
+        commentListView = locationViewDialog.findViewById(R.id.comment_listView);
+        commentsArray = new ArrayList<>();
 
 
         infoButton = locationViewDialog.findViewById(R.id.info_button);
@@ -260,6 +271,36 @@ public class MapFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+
+    public class CommentsAdapter extends BaseAdapter
+    {
+
+        @Override
+        public int getCount() {
+            return 0;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            final LayoutInflater inflater = getLayoutInflater();
+            view = inflater.inflate(R.layout.row_comment,null);
+            TextView user = view.findViewById(R.id.user_comment);
+            TextView comment = view.findViewById(R.id.text_comment);
+
+            return null;
+        }
     }
 
     private void pickLocationOptionOff(){

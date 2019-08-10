@@ -176,6 +176,8 @@
                 android:layout_height="wrap_content"
                 android:visibility="visible"
                 android:orientation="vertical"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="5dp"
                 >
 
                 <android.support.v7.widget.AppCompatTextView
@@ -208,7 +210,7 @@
                     android:textSize="25dp"
                     android:textStyle="bold"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginTop="40dp"
+                    android:layout_marginTop="20dp"
 
                     />
 
@@ -243,7 +245,7 @@
                     android:textColor="@color/colorSignInText"
                     android:textSize="25dp"
                     android:textStyle="bold"
-                    android:layout_marginTop="40dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginLeft="10dp"
 
 
@@ -294,8 +296,9 @@
                     android:background="@drawable/button_main"
                     android:text="Add comment"
                     android:textSize="14dp"
+                    android:layout_gravity="center"
                     android:layout_marginTop="10dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp"
                     />
 
 

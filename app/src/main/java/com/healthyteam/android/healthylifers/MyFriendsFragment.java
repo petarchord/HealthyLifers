@@ -164,6 +164,7 @@ public class MyFriendsFragment extends Fragment {
 
 
         adapter = new MyFriendAdapter();
+        //TODO check if adapter friend list is the same list as user's list
         listListener =new OnGetListListener() {
             @Override
             public void onChildAdded(List<?> list, int index) {
@@ -210,8 +211,6 @@ public class MyFriendsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //TODO: zakomentarisano ispod. Reciver se jednom registruje, a odjavljuje pri svakom gasenju fragmenta,zbog cega program puca. Potrebno promeniti
- //       getContext().unregisterReceiver(mReciever);
         mBlueAdapter.cancelDiscovery();
     }
 

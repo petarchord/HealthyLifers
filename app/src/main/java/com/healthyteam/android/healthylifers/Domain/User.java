@@ -20,6 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.healthyteam.android.healthylifers.Data.LocationData;
 import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
 import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Data.UserData;
@@ -52,20 +53,35 @@ public class User implements  DBReference{
     //region Getter
 
 
-
-    //region db
-
-
-    public List<Location> getPosts() {
-        //get posts from database
-        if(Posts==null){
-            Posts=DomainController.getLocationsFor(this);
+    //region db related
+    public int getFriendIndex(String uid){
+        if(friendList==null)
+            return  -1;
+        for(int i=0; i<friendList.size();i++){
+            if(friendList.get(i).getUID().equals(uid))
+                return i;
         }
-        return Posts;
+        return -1;
+    }
+    public int getPostIndex(String uid){
+        if(Posts==null)
+            return  -1;
+        for(int i=0; i<Posts.size();i++){
+            if(Posts.get(i).getUID().equals(uid))
+                return i;
+        }
+        return -1;
+    }
+    public User getFriendByUid(String uid){
+        int index = getFriendIndex(uid);
+        if(index!=-1)
+            return friendList.get(index);
+        return null;
     }
 
-    //endregion
 
+
+    //endregion
     public String getName() {
         return data.Name;
     }
@@ -86,8 +102,6 @@ public class User implements  DBReference{
     public String getImageUrl() {
         return data.ImageUrl;
     }
-
-
     public String getUID(){
        return data.UID;
     }
@@ -95,7 +109,7 @@ public class User implements  DBReference{
         return data.Username;
     }
     public Integer getPostsCount(){
-        return getPosts().size();
+        return data.PostsIds.size();
     }
     public List<String> getFriendsIds(){
         return data.FriendsIds;
@@ -179,12 +193,12 @@ public class User implements  DBReference{
         data.FriendsIds=Ids;
     }
 
-    //endregion
 
     //endregion
 
     //region Methods
-    public static void getUser(String UID, final OnGetObjectListener listener){
+    public static void getUser(String UID, final OnGetObjectListener listener)//take Data once
+    {
         DatabaseReference userReference =getDatabase().child(Constants.UsersNode).child(UID);
         userReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -203,6 +217,23 @@ public class User implements  DBReference{
             }
         });
 
+    }
+    private void getFriend(String UID, final OnGetObjectListener listener)//trigger every time Data change
+    {
+        DatabaseReference userReference =getDatabase().child(Constants.UsersNode).child(UID);
+        userReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user=  new User();
+                user.setData(dataSnapshot.getValue(UserData.class));
+                user.setUID(dataSnapshot.getKey());
+                listener.OnSuccess(user);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     public static void createAccount(String email, String password,final OnRunTaskListener listener) {
@@ -233,21 +264,7 @@ public class User implements  DBReference{
                     }
                 });
     }
-    public int getFriendIndex(String uid){
-        if(friendList==null)
-            return  -1;
-        for(int i=0; i<friendList.size();i++){
-            if(friendList.get(i).getUID().equals(uid))
-                return i;
-        }
-        return -1;
-    }
-    public User getFriendByUid(String uid){
-        int index = getFriendIndex(uid);
-        if(index!=-1)
-            return friendList.get(index);
-        return null;
-    }
+
     public void addGetFriendListener(OnGetListListener listener){
         if(friendListeners==null)
             friendListeners=new ArrayList<>();
@@ -255,6 +272,14 @@ public class User implements  DBReference{
             friendListeners.add(listener);
         getFriendList(listener);
     }
+    public void addGetPostsListener(OnGetListListener listener){
+        if(postListeners==null)
+            postListeners=new ArrayList<>();
+        if(!postListeners.contains(listener))
+            postListeners.add(listener);
+        getPosts(listener);
+    }
+
     private void getFriendList(final OnGetListListener listener) {
         if(friendList==null){
             friendList=new ArrayList<>();
@@ -286,6 +311,73 @@ public class User implements  DBReference{
         else
             listener.onListLoaded(friendList);
     }
+    public void getPosts(final OnGetListListener listener) {
+        //get posts from database
+        if(Posts==null) {
+            Posts = new ArrayList<>();
+            for (final String postId : this.getPostsIds()) {
+                DatabaseReference locationRef = getDatabase().child(Constants.LocationsNode).child(postId);
+                locationRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Location location = new Location();
+                        location.setData(dataSnapshot.getValue(LocationData.class));
+                        location.setUID(dataSnapshot.getKey());
+                        int postInd = getPostIndex(location.getUID());
+                        if (postInd != -1) {
+                            Posts.set(postInd, location);
+                            for (OnGetListListener listener : postListeners)
+                                listener.onChildChange(Posts, postInd);
+                        } else {
+                            Posts.add(location);
+                            for (OnGetListListener listener : postListeners)
+                                listener.onChildAdded(Posts, postInd);
+                        }
+                        if (friendList.size() == getFriendsIds().size()) {
+                            for (OnGetListListener listener : postListeners)
+                                listener.onListLoaded(Posts);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+            }
+        }
+        else
+            listener.onListLoaded(Posts);
+    }
+    //TODO: look up for how date will be added to new location. It need to be date of adding moment
+    public void addPost(final Location post)//funciton initialize post UID
+    {
+        if(post==null)
+            return;
+        String key = getDatabase().child(Constants.LocationsNode).push().getKey();
+        post.setUID(key);
+        post.Save(new OnSuccessListener() {
+            @Override
+            public void onSuccess(Object o) {
+                getPostsIds().add(post.getUID());
+                Save();
+                Posts.add(post);
+            }
+        });
+
+    }
+    public void removePost(final Location post)//post argument is element of Posts list
+    {
+       getDatabase().child(Constants.LocationsNode).child(post.getUID())
+                .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                getPostsIds().remove(Posts.indexOf(post));
+                Save();
+                Posts.remove(post);
+            }
+        });
+    }
+
     public void addFriend(String uid){
         data.FriendsIds.add(uid);
         getDatabase().child(Constants.UsersNode).child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -337,7 +429,7 @@ public class User implements  DBReference{
     }
     public void Save(){
         try {
-            FirebaseDatabase.getInstance().getReference().child(Constants.UsersNode).child(getUID()).setValue(data).addOnFailureListener(new OnFailureListener() {
+            getDatabase().child(Constants.UsersNode).child(getUID()).setValue(data).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Log.println(Log.WARN, "Database:", e.getMessage());
@@ -353,22 +445,7 @@ public class User implements  DBReference{
             Log.println(Log.ERROR, "Database:", e.getMessage());
         }
     }
-    private  void getFriend(String UID, final OnGetObjectListener listener){
-        DatabaseReference userReference =getDatabase().child(Constants.UsersNode).child(UID);
-        userReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user=  new User();
-                user.setData(dataSnapshot.getValue(UserData.class));
-                user.setUID(dataSnapshot.getKey());
-                listener.OnSuccess(user);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-    }
     public boolean UpdatePicture(final Uri ImageUri, final OnUploadDataListener listener ) {
         listener.onStart();
         if (ImageUri != null) {
@@ -405,9 +482,6 @@ public class User implements  DBReference{
             return false;
         }
     }
-
-
-
 
 
     //endregion

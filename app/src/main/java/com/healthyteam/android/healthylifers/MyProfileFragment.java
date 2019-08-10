@@ -234,7 +234,7 @@ public class MyProfileFragment extends Fragment {
         public void onClick(View v) {
             DomainController.getUser().setName(etxtEditName.getText().toString());
             DomainController.getUser().setSurname(etxtEditSurname.getText().toString());
-            //update userInfo
+            //TODO: update userInfo
             String NameSurname= DomainController.getUser().getName() + " " + DomainController.getUser().getSurname();
             txtNameSurname.setText(NameSurname);
 

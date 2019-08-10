@@ -81,7 +81,7 @@ public class LocationBuilder implements Builder {
     }
 
     public Location getResult(){
-        return new Location(null,Name,Descripition,DateAdded,Category,likeCount,dislikeCount,UserRate,lan,lon,commentCount,TagList,Author);
+        return new Location();
     }
 
     @Override

@@ -211,6 +211,7 @@ public class DomainController {
         return PersistenceController.getLocationFor(u);
     }
 
+    //TODO:create getNeihgborPlaces func (listener, func...)
     @Exclude
     public static void getMoreWorldUsersData(List<User> worldList, final OnGetDataListener listener){
         listener.onStart();

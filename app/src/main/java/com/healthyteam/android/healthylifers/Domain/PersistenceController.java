@@ -79,7 +79,10 @@ public class PersistenceController {
             User Author = TestFunctions.createUser();
             int likeCount = TestFunctions.randBetween(0,300);
             int dislikeCount= TestFunctions.randBetween(0,300);
-            commentList.add(new Comment(text,Author));
+            Comment comm = new Comment();
+            comm.setCreator(Author);
+            comm.setText(text);
+            commentList.add(comm);
 
 
         }

@@ -1,4 +1,11 @@
 <resources>
+    <string-array name="distances_array">
+        <item>500m</item>
+        <item>1km</item>
+        <item>2km</item>
+        <item>5km</item>
+        <item>10km</item>
+    </string-array>
     <string name="app_name">Healthy Lifers</string>
     <string name="title_map">Map</string>
     <string name="title_myfriends">My friends</string>

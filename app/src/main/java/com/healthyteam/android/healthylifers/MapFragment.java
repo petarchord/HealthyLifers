@@ -29,6 +29,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -42,10 +49,14 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
 import com.google.firebase.database.DatabaseError;
 import com.healthyteam.android.healthylifers.Data.UserLocationData;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
+
+import com.healthyteam.android.healthylifers.Domain.Comment;
+
 import com.healthyteam.android.healthylifers.Domain.User;
 import com.karumi.dexter.BuildConfig;
 
@@ -62,14 +73,12 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
-import javax.net.ssl.HttpsURLConnection;
+import java.util.ArrayList;
+
 
 
 public class MapFragment extends Fragment {
@@ -87,8 +96,16 @@ public class MapFragment extends Fragment {
     MyLocationNewOverlay myLocationOverlay;
     private Dialog addItemDialog;
     private Dialog locationViewDialog;
+    private Dialog addCommentDialog;
+    private ImageButton closeCommentDialog;
     private Fragment tabInfoFragment;
     private Fragment tabCommentsFragment;
+    private Button infoButton;
+    private Button commentsButton;
+    private Button addCommentButton;
+    private ImageButton closeLocationView;
+    private ListView commentListView;
+    private ArrayList<Comment> commentsArray;
 
     // bunch of location related apis
     private FusedLocationProviderClient mFusedLocationClient;
@@ -100,8 +117,15 @@ public class MapFragment extends Fragment {
     private LocationRequest mLocationRequest;
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private ImageButton closeAddItem;
     private SectionsPageAdapter mSectionPageAdapter;
+
     private OnGetListListener getNeighborListener;
+
+    private LinearLayout layoutInfo;
+    private LinearLayout layoutComments;
+
+
     private boolean addPlace = false;
     private static MapFragment instance;
     private List<Marker> UserMarkerList;
@@ -126,25 +150,97 @@ public class MapFragment extends Fragment {
         setLocationSettings();
         setAddLocationListener();
 
-        mSectionPageAdapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
+       // mSectionPageAdapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
 
         addItemDialog = new Dialog(getContext());
         addItemDialog.setContentView(R.layout.dialog_add_item);
 
-        locationViewDialog = new Dialog(getContext());
+        addCommentDialog = new Dialog(getContext());
+        addCommentDialog.setContentView(R.layout.dialog_add_comment);
+
+        closeCommentDialog = addCommentDialog.findViewById(R.id.closeCommentDialog);
+
+        closeAddItem = (ImageButton) addItemDialog.findViewById(R.id.closeAddItem);
+
+        locationViewDialog = new Dialog(context);
         locationViewDialog.setContentView(R.layout.dialog_location_view);
+        closeLocationView = locationViewDialog.findViewById(R.id.closeLocationDialog);
+        addCommentButton = locationViewDialog.findViewById(R.id.addCommentButton);
+        layoutInfo = locationViewDialog.findViewById(R.id.layout_info);
+        layoutComments = locationViewDialog.findViewById(R.id.layout_comments);
 
-        tabLayout = locationViewDialog.findViewById(R.id.tabsLocation);
-        viewPager = locationViewDialog.findViewById(R.id.viewPagerLocation);
+        commentListView = locationViewDialog.findViewById(R.id.comment_listView);
+        commentsArray = new ArrayList<>();
 
-        setUpViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
+
+        infoButton = locationViewDialog.findViewById(R.id.info_button);
+        commentsButton = locationViewDialog.findViewById(R.id.comments_button);
+
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                commentsButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
+                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
+                layoutComments.setVisibility(View.GONE);
+                layoutComments.invalidate();
+                layoutInfo.setVisibility(View.VISIBLE);
+                layoutInfo.invalidate();
+
+            }
+        });
+
+        commentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                infoButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
+                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
+                layoutComments.setVisibility(View.VISIBLE);
+                layoutComments.invalidate();
+                layoutInfo.setVisibility(View.GONE);
+                layoutInfo.invalidate();
+
+            }
+        });
+
+        addCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCommentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                addCommentDialog.show();
+            }
+        });
+
+        closeLocationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locationViewDialog.dismiss();
+            }
+        });
+
+        closeCommentDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCommentDialog.dismiss();
+            }
+        });
+
+        closeAddItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addItemDialog.dismiss();
+            }
+        });
 
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addItemDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 addItemDialog.show();
+
+              //locationViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+             // locationViewDialog.show();
+
 
             }
         });
@@ -188,15 +284,7 @@ public class MapFragment extends Fragment {
 
     }
 
-    public void setUpViewPager(ViewPager viewPager)
-    {
-        SectionsPageAdapter adapter = new SectionsPageAdapter(((MainActivity) getContext()).getSupportFragmentManager());
-        tabInfoFragment = new Fragment();
-        tabCommentsFragment = new Fragment();
-        adapter.addFragment(tabInfoFragment,"TabInfoFragment");
-        adapter.addFragment(tabCommentsFragment,"TabCommentsFragment");
-        viewPager.setAdapter(adapter);
-    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -235,6 +323,36 @@ public class MapFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+
+    public class CommentsAdapter extends BaseAdapter
+    {
+
+        @Override
+        public int getCount() {
+            return 0;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            final LayoutInflater inflater = getLayoutInflater();
+            view = inflater.inflate(R.layout.row_comment,null);
+            TextView user = view.findViewById(R.id.user_comment);
+            TextView comment = view.findViewById(R.id.text_comment);
+
+            return null;
+        }
     }
 
     private void pickLocationOptionOff(){

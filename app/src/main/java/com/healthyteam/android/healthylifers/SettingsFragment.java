@@ -32,6 +32,16 @@ public class SettingsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_settings,container,false);
         bluetooth = view.findViewById(R.id.bluetoothSwitch);
         mBlueAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if(mBlueAdapter.isEnabled())
+        {
+            bluetooth.setChecked(true);
+        }
+        else
+        {
+            bluetooth.setChecked(false);
+        }
+
         bluetooth.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -51,15 +61,12 @@ public class SettingsFragment extends Fragment {
                     {
                         Intent intent =new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                         startActivityForResult(intent,REQUEST_ENABLE_BT);
+                        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                        startActivity(discoverableIntent);
 
                     }
-                    if(!mBlueAdapter.isDiscovering())
-                    {
                         /*Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
                         startActivity(intent);*/
-                        mBlueAdapter.startDiscovery();
-
-                    }
 
                 }
                 else
@@ -69,10 +76,8 @@ public class SettingsFragment extends Fragment {
                         mBlueAdapter.disable();
                         showToast("Bluetooth turned off");
                     }
-                    if(mBlueAdapter.isDiscovering())
-                    {
-                        mBlueAdapter.cancelDiscovery();
-                    }
+
+                    mBlueAdapter.cancelDiscovery();
 
 
                 }
@@ -99,7 +104,7 @@ public class SettingsFragment extends Fragment {
                 if(resultCode == RESULT_OK)
                 {
                     mBlueAdapter.enable();
-                    showToast("Bluetooth turned on");
+                  //  showToast("Bluetooth turned on");
                 }
                 else
                 {

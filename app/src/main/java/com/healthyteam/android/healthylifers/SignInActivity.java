@@ -59,6 +59,8 @@ public class SignInActivity extends AppCompatActivity {
     private Dialog registerWindow;
     private ImageButton exitSignIn;
     private ImageButton exitRegister;
+    private TextView errorTextSignin;
+    private TextView errorTextRegister;
     private Context context;
     private static final String TAG = "SignInActivity";
 
@@ -80,6 +82,8 @@ public class SignInActivity extends AppCompatActivity {
 
         signinEmail = signInWindow.findViewById(R.id.signinEmail);
         signinPassword = signInWindow.findViewById(R.id.signinPassword);
+        errorTextSignin = signInWindow.findViewById(R.id.error_text_signin);
+        errorTextRegister = registerWindow.findViewById(R.id.error_text_register);
 
         registerEmail = registerWindow.findViewById(R.id.editTextEmailRegister);
         registerName = registerWindow.findViewById(R.id.editTextNameRegister);
@@ -98,9 +102,11 @@ public class SignInActivity extends AppCompatActivity {
         signInSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"Sign in clicked!",Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(context,"Sign in clicked!",Toast.LENGTH_SHORT).show();
                 String email = signinEmail.getText().toString();
                 String password = signinPassword.getText().toString();
+                if(!validateSigninForm())
+                    return;
                 signIn(email,password);
 
             }
@@ -111,6 +117,8 @@ public class SignInActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email = registerEmail.getText().toString();
                 String password = registerPassword.getText().toString();
+                if(!validateRegisterForm())
+                    return;
                 createAccount(email,password);
 
             }
@@ -183,6 +191,8 @@ public class SignInActivity extends AppCompatActivity {
         String email = registerEmail.getText().toString();
         if (TextUtils.isEmpty(email)) {
             registerEmail.setError("Required.");
+            errorTextRegister.setText("Please enter your email address.");
+            errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
             registerEmail.setError(null);
@@ -191,22 +201,36 @@ public class SignInActivity extends AppCompatActivity {
         String password = registerPassword.getText().toString();
         if (TextUtils.isEmpty(password)) {
             registerPassword.setError("Required.");
+            errorTextRegister.setText("Please enter your password.");
+            errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
             registerPassword.setError(null);
         }
 
-       /* String passwordRepeat = registerPasswordRepeat.getText().toString();
+        String passwordRepeat = registerPasswordRepeat.getText().toString();
         if (TextUtils.isEmpty(passwordRepeat)) {
             registerPasswordRepeat.setError("Required.");
+            errorTextRegister.setText("Please enter your password.");
+            errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
             registerPasswordRepeat.setError(null);
         }
 
+
+        if(password != passwordRepeat)
+        {
+            errorTextRegister.setText("Your passwords must match!");
+            errorTextRegister.setVisibility(View.VISIBLE);
+            valid = false;
+        }
+
         String username = registerUsername.getText().toString();
         if (TextUtils.isEmpty(username)) {
             registerUsername.setError("Required.");
+            errorTextRegister.setText("Please enter your username.");
+            errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
             registerUsername.setError(null);
@@ -215,6 +239,8 @@ public class SignInActivity extends AppCompatActivity {
         String name = registerName.getText().toString();
         if (TextUtils.isEmpty(name)) {
             registerName.setError("Required.");
+            errorTextRegister.setText("Please enter your name.");
+            errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
             registerName.setError(null);
@@ -223,10 +249,22 @@ public class SignInActivity extends AppCompatActivity {
         String surname = registerSurname.getText().toString();
         if (TextUtils.isEmpty(surname)) {
             registerSurname.setError("Required.");
+            errorTextRegister.setText("Please enter your surname.");
+            errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
             registerSurname.setError(null);
-        } */
+        }
+
+        if(TextUtils.isEmpty(email) && TextUtils.isEmpty(password) &&
+                TextUtils.isEmpty(passwordRepeat) && TextUtils.isEmpty(username)
+                && TextUtils.isEmpty(name) && TextUtils.isEmpty(surname)
+        )
+        {
+            errorTextRegister.setText("Please enter required fields.");
+            errorTextRegister.setVisibility(View.VISIBLE);
+            valid = false;
+        }
 
         return valid;
     }
@@ -239,6 +277,8 @@ public class SignInActivity extends AppCompatActivity {
         String email = signinEmail.getText().toString();
         if (TextUtils.isEmpty(email)) {
             signinEmail.setError("Required.");
+            errorTextSignin.setText("Please enter your email address.");
+            errorTextSignin.setVisibility(View.VISIBLE);
             valid = false;
         } else {
             signinEmail.setError(null);
@@ -247,6 +287,8 @@ public class SignInActivity extends AppCompatActivity {
         String password = signinPassword.getText().toString();
         if (TextUtils.isEmpty(password)) {
             signinPassword.setError("Required.");
+            errorTextSignin.setText("Please enter your password.");
+            errorTextSignin.setVisibility(View.VISIBLE);
             valid = false;
         } else {
             signinPassword.setError(null);

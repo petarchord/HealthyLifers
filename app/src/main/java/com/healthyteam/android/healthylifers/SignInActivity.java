@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
@@ -61,6 +62,8 @@ public class SignInActivity extends AppCompatActivity {
     private ImageButton exitRegister;
     private TextView errorTextSignin;
     private TextView errorTextRegister;
+    private ProgressBar circulalSignIn;
+    private ProgressBar circularRegister;
     private Context context;
     private static final String TAG = "SignInActivity";
 
@@ -83,6 +86,7 @@ public class SignInActivity extends AppCompatActivity {
         signinEmail = signInWindow.findViewById(R.id.signinEmail);
         signinPassword = signInWindow.findViewById(R.id.signinPassword);
         errorTextSignin = signInWindow.findViewById(R.id.error_text_signin);
+        circulalSignIn = signInWindow.findViewById(R.id.circular_signin);
         errorTextRegister = registerWindow.findViewById(R.id.error_text_register);
 
         registerEmail = registerWindow.findViewById(R.id.editTextEmailRegister);
@@ -91,6 +95,8 @@ public class SignInActivity extends AppCompatActivity {
         registerUsername = registerWindow.findViewById(R.id.editTextUsernameRegister);
         registerPassword = registerWindow.findViewById(R.id.editTextPassRedgister);
         registerPasswordRepeat = registerWindow.findViewById(R.id.editTextPassRepeatRegister);
+        circularRegister = registerWindow.findViewById(R.id.circular_register);
+
 
         exitSignIn = (ImageButton) signInWindow.findViewById(R.id.closeSignInForm);
         exitRegister = (ImageButton) registerWindow.findViewById(R.id.closeRegisterForm);
@@ -105,8 +111,13 @@ public class SignInActivity extends AppCompatActivity {
               //  Toast.makeText(context,"Sign in clicked!",Toast.LENGTH_SHORT).show();
                 String email = signinEmail.getText().toString();
                 String password = signinPassword.getText().toString();
+                circulalSignIn.setVisibility(View.VISIBLE);
                 if(!validateSigninForm())
+                {
+                    circulalSignIn.setVisibility(View.GONE);
                     return;
+                }
+
                 signIn(email,password);
 
             }
@@ -117,8 +128,13 @@ public class SignInActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email = registerEmail.getText().toString();
                 String password = registerPassword.getText().toString();
+                circularRegister.setVisibility(View.VISIBLE);
                 if(!validateRegisterForm())
+                {
+                    circularRegister.setVisibility(View.GONE);
                     return;
+                }
+
                 createAccount(email,password);
 
             }
@@ -195,6 +211,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerEmail.setError(null);
         }
 
@@ -205,6 +222,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerPassword.setError(null);
         }
 
@@ -215,6 +233,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerPasswordRepeat.setError(null);
         }
 
@@ -225,6 +244,10 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         }
+        else
+        {
+            errorTextRegister.setVisibility(View.GONE);
+        }
 
         String username = registerUsername.getText().toString();
         if (TextUtils.isEmpty(username)) {
@@ -233,6 +256,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerUsername.setError(null);
         }
 
@@ -243,6 +267,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerName.setError(null);
         }
 
@@ -253,6 +278,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerSurname.setError(null);
         }
 
@@ -264,6 +290,10 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setText("Please enter required fields.");
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
+        }
+        else
+        {
+            errorTextRegister.setVisibility(View.GONE);
         }
 
         return valid;
@@ -281,6 +311,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextSignin.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextSignin.setVisibility(View.GONE);
             signinEmail.setError(null);
         }
 
@@ -291,6 +322,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextSignin.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextSignin.setVisibility(View.GONE);
             signinPassword.setError(null);
         }
 

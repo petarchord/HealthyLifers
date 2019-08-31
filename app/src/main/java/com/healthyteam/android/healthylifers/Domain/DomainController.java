@@ -1,9 +1,11 @@
 package com.healthyteam.android.healthylifers.Domain;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.NumberPicker;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -19,7 +21,7 @@ import com.healthyteam.android.healthylifers.Data.UserLocationData;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 public class DomainController {
     static private User UserInstance;
@@ -47,6 +49,13 @@ public class DomainController {
         neighborListeners.add(listener);
         getNeighbors(listener);
     }
+    public static boolean removeGetNeighborsListener(OnGetListListener listener){
+        return neighborListeners.remove(listener);
+    }
+    public static void reinitalizeNeighbors(){
+        Neighbors=null;
+        getNeighbors(null);
+    }
     private static void getNeighbors(OnGetListListener listener){
         if(Neighbors ==null) {
             Neighbors = new ArrayList<>();
@@ -58,6 +67,8 @@ public class DomainController {
                     UserLocationData u=new UserLocationData();
                     User user= new User();
                     user.setData(dataSnapshot.getValue(UserData.class));
+                    if(getUser().getUID().equals(dataSnapshot.getKey()))
+                        return;
                     u.setUID(dataSnapshot.getKey());
                     u.setLongitude(user.getLongitude());
                     u.setLatitude(user.getLatitude());
@@ -207,7 +218,7 @@ public class DomainController {
                 return i;
         return -1;
     }
-    public static List<Location> getLocationsFor(User u){
+    public static List<UserLocation> getLocationsFor(User u){
         return PersistenceController.getLocationFor(u);
     }
 
@@ -231,5 +242,15 @@ public class DomainController {
             }
         });
     }
-
+    public static String getCityFromCoo(Context context, Double latitude, Double longitude){
+        try {
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            List<Address> addresses= geocoder.getFromLocation(latitude, longitude, 1);
+            return addresses.get(0).getLocality();
+        }
+        catch (Exception e){
+            Log.println(Log.ERROR,"Geocoder", e.getMessage());
+        }
+        return "Error";
+    }
 }

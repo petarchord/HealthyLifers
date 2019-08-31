@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
          //region test
         TestFunctions.setContext(this);
         final User u = TestFunctions.createUser();
-        User.signIn("test15@test.com", "test0015", new OnRunTaskListener() {
+        User.signIn("test42@test.com", "test0042", new OnRunTaskListener() {
             @Override
             public void OnStart() {
 

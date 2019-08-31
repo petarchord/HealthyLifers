@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class Location {
+public class UserLocation {
     public static enum Category {
         EVENT, HEALTHYFOOD, COURT, FITNESSCENTER
     }
@@ -43,7 +43,10 @@ public class Location {
     private Rate UserRate;
     private User Author;
 
-    public Location(){}
+    public UserLocation(){
+        Data=new LocationData();
+        Comments = new LinkedList<>();
+    }
 
     //region private funciton
     private String getDate() {
@@ -241,7 +244,14 @@ public class Location {
     public void setTagList(List<String> tagList) {
         Data.Tags = tagList;
     }
+    public void setTagListFromString(String Tags){
+        this.setTagList(new LinkedList<String>());
+        String[] splitTags = Tags.split("#");
+        for(int i=1;i<splitTags.length;i++){
+            this.getTagList().add(splitTags[i]);
+        }
 
+    }
     public void setCategory(Integer category) {
         Data.Category = category;
     }
@@ -253,18 +263,23 @@ public class Location {
         UserRate = rate;
     }
 
-    public void setLan(Double lat) {
+    public void setLat(Double lat) {
         Data.Latitude = lat;
     }
     public void setLon(Double lon) {
         Data.Longitude = lon;
+    }
+    public void setCity(String City){
+        this.Data.City=City;
     }
     public void setComments(List<Comment> comments) {
         Comments = comments;
     }
     public void setAuthor(User author) {
         Author = author;
+        Data.AuthorUID=author.getUID();
     }
+
 //endregion
 
     //region dbFunction
@@ -346,6 +361,10 @@ public class Location {
 
     //WRITE
     public void Save(final OnSuccessListener listener){
+        if(getUID()==null){
+            String key =getDatabase().child(Constants.LocationsNode).push().getKey();
+            setUID(key);
+        }
         try {
             getDatabase().child(Constants.LocationsNode).child(getUID()).setValue(Data).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -365,7 +384,7 @@ public class Location {
             Log.println(Log.ERROR, "Database:", e.getMessage());
         }
     }
-    public boolean UpdatePicture(final Uri ImageUri, final OnUploadDataListener listener ) {
+    public boolean UpdatePicture(final Uri ImageUri, final OnUploadDataListener listener) {
         listener.onStart();
         if (ImageUri != null) {
             StorageReference fileReference = FirebaseStorage.getInstance().

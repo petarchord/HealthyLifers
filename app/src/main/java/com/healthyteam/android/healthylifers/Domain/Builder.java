@@ -9,10 +9,10 @@ public interface Builder {
     void setName(String Name);
     void setDescripition(String Desc);
     void setDateAdded(String DateAdded);
-    void setCategory(Location.Category category);
+    void setCategory(UserLocation.Category category);
     void setLikeCount(int Count);
     void setDislikeCount(int Count);
-    void setUserRate(Location.Rate Rate);
+    void setUserRate(UserLocation.Rate Rate);
     void setLangitude(Double lan);
     void setLongitude(Double lon);
     void setCommentCount(int Count);

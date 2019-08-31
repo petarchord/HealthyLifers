@@ -10,10 +10,10 @@ public class LocationBuilder implements Builder {
     private String Descripition;
     private String DateAdded;
     private List<String> TagList;
-    private Location.Category Category;
+    private UserLocation.Category Category;
     private int likeCount;
     private int dislikeCount;
-    private Location.Rate UserRate;
+    private UserLocation.Rate UserRate;
     private Double lan;
     private Double lon;
    // private List<Comments> Comments;
@@ -42,7 +42,7 @@ public class LocationBuilder implements Builder {
     }
 
     @Override
-    public void setCategory(Location.Category category) {
+    public void setCategory(UserLocation.Category category) {
         this.Category=category;
     }
 
@@ -57,7 +57,7 @@ public class LocationBuilder implements Builder {
     }
 
     @Override
-    public void setUserRate(Location.Rate Rate) {
+    public void setUserRate(UserLocation.Rate Rate) {
         this.UserRate=Rate;
     }
 
@@ -80,8 +80,8 @@ public class LocationBuilder implements Builder {
         this.Author=Author;
     }
 
-    public Location getResult(){
-        return new Location();
+    public UserLocation getResult(){
+        return new UserLocation();
     }
 
     @Override

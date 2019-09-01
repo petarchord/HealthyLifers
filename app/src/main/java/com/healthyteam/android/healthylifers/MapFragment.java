@@ -178,6 +178,7 @@ public class MapFragment extends Fragment {
         fabCenterLocation = layout_fragment.findViewById(R.id.floatingActionButton_centerLocation);
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         map = layout_fragment.findViewById(R.id.MapView);
+        setCurrentUserLocation();
         initMap();
         setLocationSettings();
 
@@ -545,14 +546,24 @@ public class MapFragment extends Fragment {
         setMyLocationOverlay();
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
         configChangeLocationListener();
-        if(currZoom==null) {
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                mapController.setZoom(15.0);
-        }
+    }
+    private void setCurrentUserLocation(){
+        //TODO: try-catch block. For now exception couse application break which is fine
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            currLocation=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        String City = DomainController.getCityFromCoo(context, currLocation.getLatitude(),currLocation.getLongitude());
+        DomainController.getUser().updateLocation();
+        if(DomainController.getUser().updateCity(City))
+            DomainController.reinitalizeNeighbors();
     }
     private void configChangeLocationListener(){
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,10,new OsmLocationHandler());
+        //TODO: try-catch block. For now exception couse application break which is fine
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            //TODO: without FakeGPS requestLocationUpdates Event doesn't called on beggining
+
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10, new OsmLocationHandler());
+        }
     }
     private void setLocationSettings() {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);//trenutno ne koristim, a moze da se koristi za lokaciju
@@ -605,15 +616,13 @@ public class MapFragment extends Fragment {
     }
 
     private void updateLocationUI() {
-        if (currLocation == null){
-            User user = DomainController.getUser();
-            mapController.setCenter(new GeoPoint(user.getLatitude(),user.getLongitude()));
-            }
-        else{
-            mapController.setCenter(new GeoPoint(currLocation.getLatitude(), currLocation.getLongitude()));
-            if (currZoom != null)
-                mapController.setZoom(currZoom);
+        mapController.setCenter(new GeoPoint(currLocation.getLatitude(), currLocation.getLongitude()));
+        if (currZoom != null)
+            mapController.setZoom(currZoom);
+        else {
+            mapController.setZoom(15.0);
         }
+
     }
     private void centerUserLocation(){
         map.getOverlays().remove(myLocationOverlay);
@@ -623,14 +632,9 @@ public class MapFragment extends Fragment {
     private void setMyLocationOverlay(){
         myLocationOverlay= new MyLocationNewOverlay(new GpsMyLocationProvider(getContext()),map);
         myLocationOverlay.enableMyLocation();
+        myLocationOverlay.enableFollowLocation();
+        updateLocationUI();
 
-        if(currLocation!=null)
-            updateLocationUI();
-        else {
-
-            myLocationOverlay.enableFollowLocation();
-            updateLocationUI();
-        }
         map.getOverlays().add(this.myLocationOverlay);
     }
 
@@ -768,7 +772,6 @@ public class MapFragment extends Fragment {
         }
     }
     //function should recive Location parametar in the future
-    //TODO: !!!TEST: User interface update when neigboor change position
     class OsmLocationHandler implements LocationListener
     {
         @Override
@@ -776,11 +779,10 @@ public class MapFragment extends Fragment {
             currLocation=location;
             DomainController.getUser().setLocation(location);
             String City = DomainController.getCityFromCoo(context, currLocation.getLatitude(),currLocation.getLongitude());
-            //TODO: check if location update when user sign in and in which case
             //TODO: maybe need option for eneble/disable option for updateLocation
             DomainController.getUser().updateLocation();
-            //TODO: doesn't remove previous marker which is good for now
 
+            //TODO: doesn't remove previous marker which is good for now
             if(DomainController.getUser().updateCity(City))
                 DomainController.reinitalizeNeighbors();
             Log.i("OSMLocationHandler: ", "Lat:" + location.getLatitude() +" Lon: " +location.getLongitude());

@@ -1,6 +1,5 @@
 package com.healthyteam.android.healthylifers;
 
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,7 +15,7 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseError;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
-import com.healthyteam.android.healthylifers.Domain.Location;
+import com.healthyteam.android.healthylifers.Domain.UserLocation;
 import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.User;
 import com.squareup.picasso.Picasso;
@@ -76,7 +75,7 @@ public class FriendProfileFragment extends Fragment {
             @Override
             public void onChildAdded(List<?> list, int index) {
                 if(lvPosts.getAdapter()==null) {
-                    placeAdapter.setPosts((List<Location>) list);
+                    placeAdapter.setPosts((List<UserLocation>) list);
                     lvPosts.setAdapter(placeAdapter);
                 }
                 placeAdapter.notifyDataSetChanged();
@@ -100,7 +99,7 @@ public class FriendProfileFragment extends Fragment {
             @Override
             public void onListLoaded(List<?> list) {
                 if(lvPosts.getAdapter()==null) {
-                    placeAdapter.setPosts((List<Location>) list);
+                    placeAdapter.setPosts((List<UserLocation>) list);
                     lvPosts.setAdapter(placeAdapter);
                 }
             }
@@ -114,8 +113,8 @@ public class FriendProfileFragment extends Fragment {
     }
 
     public class PlaceItemAdapter extends BaseAdapter {
-        private List<Location> Posts;
-        public void setPosts(List<Location> post){
+        private List<UserLocation> Posts;
+        public void setPosts(List<UserLocation> post){
             Posts=post;
         }
         @Override
@@ -145,7 +144,7 @@ public class FriendProfileFragment extends Fragment {
             final ImageView likeImgView =view.findViewById(R.id.imageView_LikePicFI);
             final ImageView dislikeImgView = view.findViewById(R.id.imageView_dislikePicFI);
             ImageView imageProfile = (ImageView) view.findViewById(R.id.imageView_PlacePicPI);
-            final Location currlocation = Posts.get(i);
+            final UserLocation currlocation = Posts.get(i);
 
 
             //TODO: set location picture from db. With piccaso

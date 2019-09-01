@@ -30,8 +30,8 @@ public class PersistenceController {
         return WorldUsers;
     }
 
-    public  static List<Location> getLocationFor(User u){
-        LinkedList<Location> userLocations = new LinkedList<Location>();
+    public  static List<UserLocation> getLocationFor(User u){
+        LinkedList<UserLocation> userLocations = new LinkedList<UserLocation>();
         //get location for User from database
         Bitmap picture=null;
         String name= "Location name";
@@ -61,8 +61,8 @@ public class PersistenceController {
             builder.setLikeCount(likeCount);
             builder.setDislikeCount(dislikeCount);
             builder.setCommentCount(commentCount);
-            builder.setUserRate(Location.Rate.values()[rate]);
-            builder.setCategory(Location.Category.values()[category]);
+            builder.setUserRate(UserLocation.Rate.values()[rate]);
+            builder.setCategory(UserLocation.Category.values()[category]);
             builder.setTags(tags);
             userLocations.add(builder.getResult());
         }
@@ -72,7 +72,7 @@ public class PersistenceController {
 
     }
 
-    public static List<Comment> getCommentsFor(Location l){
+    public static List<Comment> getCommentsFor(UserLocation l){
         LinkedList<Comment> commentList = new LinkedList<Comment>();
         String text = "Comment content";
         for(int i=0;i<l.getCommentCount();i++) {

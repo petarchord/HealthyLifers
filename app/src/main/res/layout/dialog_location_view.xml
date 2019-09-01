@@ -192,6 +192,7 @@
                     />
 
                 <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/TextView_LocationDescDLV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/location_desc"
@@ -253,6 +254,7 @@
 
 
                 <TextView
+                    android:id="@+id/TextView_TagsDLV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="tennis , basketball , voleyball..."

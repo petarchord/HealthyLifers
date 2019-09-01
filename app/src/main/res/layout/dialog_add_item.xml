@@ -17,6 +17,7 @@
             android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/ImageView_LocationPic"
                 android:layout_width="160dp"
                 android:layout_height="160dp"
                 android:background="#FFFFFF"
@@ -25,7 +26,7 @@
                 />
 
             <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/closeAddItem"
+                android:id="@+id/ImageButton_closeAddItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/close_box_add_item"
@@ -50,6 +51,7 @@
             >
 
             <android.support.v7.widget.AppCompatButton
+                android:id="@+id/Button_AddImageDAI"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
@@ -69,6 +71,7 @@
                 />
 
             <EditText
+                android:id="@+id/EditText_LocationNameDAI"
                 android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:layout_marginLeft="20dp"
@@ -89,6 +92,7 @@
                 />
 
             <EditText
+                android:id="@+id/EditText_LocationDescDAI"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
@@ -126,6 +130,7 @@
                 />
 
             <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/cbEvent"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 />
@@ -138,6 +143,7 @@
                 />
 
             <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/cbCourt"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 />
@@ -152,8 +158,10 @@
                 />
 
             <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/cbFitnessCenter"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+
                 />
 
 
@@ -164,6 +172,7 @@
                 />
 
             <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/cbHealthyFood"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 />
@@ -181,6 +190,7 @@
 
 
         <LinearLayout
+            android:id="@+id/btnPost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -197,17 +207,21 @@
                 />
 
             <EditText
+                android:id="@+id/EditText_TagsDAI"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="20dp"
+                android:inputType="text"
+                android:digits="0,1,2,3,4,5,6,7,8,9,qwertzuiopasdfghjklyxcvbnm,#"
                 android:hint="Add tags here..."
                 android:background="#A9A9A9"
                 />
 
 
             <android.support.v7.widget.AppCompatButton
+                android:id="@+id/Button_PostDAI"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

@@ -2,6 +2,7 @@ package com.healthyteam.android.healthylifers.Domain;
 
 
 
+import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -26,7 +27,9 @@ import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Data.UserData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class User implements  DBReference{
@@ -34,7 +37,7 @@ public class User implements  DBReference{
     private List<User> friendList;
     private List<OnGetListListener> friendListeners;
     private List<OnGetListListener> postListeners;
-    private List<Location> Posts;
+    private List<UserLocation> Posts;
 
     //u konacnoj imp dodati jos email, lan, lon
     public User(String name, String surname, String username, Integer points) {
@@ -181,10 +184,15 @@ public class User implements  DBReference{
     public void setLongitude(Double lon){
         data.Longitude= lon;
     }
+    public void setLocation(Location location){
+        setLatitude(location.getLatitude());
+        setLongitude(location.getLongitude());
+    }
     public void setCity(String city){
         data.City=city;
 
     }
+    //TODO: maybe create new function for coordinate update where function will update city
     public void setData(UserData data){
         this.data=data;
     }
@@ -320,7 +328,7 @@ public class User implements  DBReference{
                 locationRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Location location = new Location();
+                        UserLocation location = new UserLocation();
                         location.setData(dataSnapshot.getValue(LocationData.class));
                         location.setUID(dataSnapshot.getKey());
                         int postInd = getPostIndex(location.getUID());
@@ -349,7 +357,7 @@ public class User implements  DBReference{
             listener.onListLoaded(Posts);
     }
     //TODO: look up for how date will be added to new location. It need to be date of adding moment
-    public void addPost(final Location post)//funciton initialize post UID
+    public void addPost(final UserLocation post)//funciton initialize post UID
     {
         if(post==null)
             return;
@@ -365,7 +373,7 @@ public class User implements  DBReference{
         });
 
     }
-    public void removePost(final Location post)//post argument is element of Posts list
+    public void removePost(final UserLocation post)//post argument is element of Posts list
     {
        getDatabase().child(Constants.LocationsNode).child(post.getUID())
                 .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -445,6 +453,56 @@ public class User implements  DBReference{
             Log.println(Log.ERROR, "Database:", e.getMessage());
         }
     }
+    public void updateLocation(){
+        try {
+            Map<String, Object> LocationValues = new HashMap<>();
+            LocationValues.put(Constants.LocationLatitudeAtt,getLatitude());
+            LocationValues.put(Constants.LocationLongitutdeAtt,getLongitude());
+
+            getDatabase().child(Constants.UsersNode).child(getUID()).updateChildren(LocationValues).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.println(Log.WARN, "Database:", e.getMessage());
+                }
+            }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.println(Log.WARN, "Database: ", "Success");
+                }
+            });
+        }
+        catch(Exception e){
+            Log.println(Log.ERROR, "Database:", e.getMessage());
+        }
+
+    }
+    //TODO: return true can have better position
+    public boolean updateCity(String City){
+        if(getCity() != null)
+        {
+            if(getCity().equals(City))
+            return false;
+        }
+        setCity(City);
+        try {
+            getDatabase().child(Constants.UsersNode).child(getUID()).child(Constants.LocationCityAtt).setValue(City).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.println(Log.WARN, "Database:", e.getMessage());
+                }
+            }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.println(Log.WARN, "Database: ", "Success");
+                }
+            });
+        }
+        catch(Exception e){
+            Log.println(Log.ERROR, "Database:", e.getMessage());
+        }
+        return true;
+    }
+
 
     public boolean UpdatePicture(final Uri ImageUri, final OnUploadDataListener listener ) {
         listener.onStart();

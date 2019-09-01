@@ -1,7 +1,5 @@
 package com.healthyteam.android.healthylifers.Domain;
 
-import com.healthyteam.android.healthylifers.Domain.Location;
-
 public class Constants {
     public static final String UsersNode ="users";
     public static final String LocationsNode ="locations";
@@ -12,11 +10,14 @@ public class Constants {
     public static final String UserFriendIdsAtt = "FriendIds";
     public static final String UserActiveAtt="Active";
     public static final String UserCityAtt="City";
-    public static final String LocationCategoryAtt="Category";
 
+    public static final String LocationCategoryAtt="Category";
+    public static final String LocationLatitudeAtt="Latitude";
+    public static final String LocationLongitutdeAtt="Longitude";
+    public static final String LocationCityAtt = "City";
     public static final Integer showUserCount = 30;
-    public static final Integer LocationCategoryEvent = Location.Category.EVENT.ordinal();
-    public static final Integer LocationCategoryHealthyFood =Location.Category.HEALTHYFOOD.ordinal();
-    public static final Integer LocationCategoryCourt=Location.Category.COURT.ordinal();
-    public static final Integer LocationCategoryFitnessCenter=Location.Category.FITNESSCENTER.ordinal();
+    public static final Integer LocationCategoryEvent = UserLocation.Category.EVENT.ordinal();
+    public static final Integer LocationCategoryHealthyFood = UserLocation.Category.HEALTHYFOOD.ordinal();
+    public static final Integer LocationCategoryCourt= UserLocation.Category.COURT.ordinal();
+    public static final Integer LocationCategoryFitnessCenter= UserLocation.Category.FITNESSCENTER.ordinal();
 }

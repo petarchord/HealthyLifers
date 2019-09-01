@@ -18,6 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,8 +59,11 @@ public class MyFriendsFragment extends Fragment {
     private Button dialogBtnOk;
     private Button dialogBtnCancel;
     private Dialog deleteFriendDialog;
+    private Dialog friendRequestDialog;
     private Button dialogBtnYes;
     private Button dialogBtnNo;
+    private Button acceptFriend;
+    private Button rejectFriend;
     private ImageButton exitAddFriendsDialog;
     private static MyFriendsFragment instance;
     private MyFriendAdapter adapter;
@@ -70,6 +74,7 @@ public class MyFriendsFragment extends Fragment {
     private BluetoothAdapter mBlueAdapter;
     private BroadcastReceiver mReciever;
     private ArrayList<BluetoothDevice> devicesArray;
+    private String friendToAdd;
    // private BluetoothDevice[] btArray;
     private static final String APP_NAME = "HealthyLifers";
     private static final UUID MY_UUID = UUID.fromString("03866f41-7d1e-4d16-96bf-2c6ba69850e4");
@@ -103,6 +108,11 @@ public class MyFriendsFragment extends Fragment {
         addFriendDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         lvAddFriends = addFriendDialog.findViewById(R.id.ListView_BluetoothItems);
         exitAddFriendsDialog = addFriendDialog.findViewById(R.id.closeAddFriendDialog);
+        friendRequestDialog = new Dialog(getContext());
+        friendRequestDialog.setContentView(R.layout.dialog_friend_request);
+        friendRequestDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        acceptFriend = friendRequestDialog.findViewById(R.id.button_accept_friend);
+        rejectFriend = friendRequestDialog.findViewById(R.id.button_reject_friend);
         /*dialogBtnOk = addFriendDialog.findViewById(R.id.button_okDAF);
         dialogBtnCancel=addFriendDialog.findViewById(R.id.button_cancelDAF);*/
 
@@ -184,6 +194,30 @@ public class MyFriendsFragment extends Fragment {
                 addFriendDialog.show();
             }
         });
+
+        acceptFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(friendToAdd != null)
+                {
+                    DomainController.getUser().addFriend(friendToAdd);
+                    showToast("Friend accepted.");
+                    friendRequestDialog.dismiss();
+                    addFriendDialog.dismiss();
+                }
+            }
+        });
+
+        rejectFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showToast("Friend rejected.");
+                friendRequestDialog.dismiss();
+                addFriendDialog.dismiss();
+
+            }
+        });
         /*dialogBtnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -256,13 +290,18 @@ public class MyFriendsFragment extends Fragment {
                 case 0:
                 {
                     mBlutetoothConnection = (ConnectionThread)msg.obj;
-                    mBlutetoothConnection.write("My first message.".getBytes());
+                    String uid= DomainController.getUser().getUID();
+                    mBlutetoothConnection.write(uid.getBytes());
                     break;
                 }
                 case 1:
                 {
-                    String message =(String) msg.obj;
-                    showToast(message);
+
+                    String message=new String((byte[])msg.obj);
+                    friendToAdd = message;
+                    friendRequestDialog.show();
+                 //   DomainController.getUser().addFriend(message);
+                 //   showToast(message);
                     break;
                 }
                 case 2:
@@ -557,6 +596,7 @@ public class MyFriendsFragment extends Fragment {
                     numBytes = mmInStream.read(mmBufer);
                     Message readMsg = mHandler.obtainMessage(1,numBytes,-1,mmBufer);
                     readMsg.sendToTarget();
+                    Log.e("CONNECTION THREAD", "Buffer filled with contain from the input stream ");
                 }
                 catch (IOException e)
                 {
@@ -601,7 +641,7 @@ public class MyFriendsFragment extends Fragment {
        // Log.e("Server-Client","connected socket:"+s);
         ConnectionThread conn = new ConnectionThread(s,mHandler);
         mHandler.obtainMessage(0,conn).sendToTarget();
-
+        conn.start();
 
     }
 }

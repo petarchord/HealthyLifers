@@ -114,43 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
-         //region test
-        TestFunctions.setContext(this);
-        final User u = TestFunctions.createUser();
-        User.signIn("test15@test.com", "test0015", new OnRunTaskListener() {
-            @Override
-            public void OnStart() {
-
-            }
-
-            @Override
-            public void OnComplete(Task<?> task) {
-                if(task.isSuccessful()){
-                    User.getUser(mAuth.getCurrentUser().getUid(), new OnGetObjectListener() {
-                        @Override
-                        public void OnSuccess(Object o) {
-                            DomainController.setUser((User) o);
-                            if (savedInstanceState == null) {
-                                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                                        MapFragment.getInstance()).commit();
-                            }
-                        }
-                    });
-                }
-                else{
-                    //TODO: error message
-                    //below is test region
-                    createNewUser(u);
-                    DomainController.setUser(u);
-                    if (savedInstanceState == null) {
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                                MapFragment.getInstance()).commit();}
-                }
-            }
-        });
-
-        //testFunction();
-        //endregion
 
         addItemDialog = new Dialog(this);
         addItemDialog.setContentView(R.layout.dialog_add_item);
@@ -214,7 +177,10 @@ public class MainActivity extends AppCompatActivity {
     private void signOut() {
         mAuth.signOut();
         Intent i = new Intent(getApplicationContext(),SignInActivity.class);
+        //TODO update user account before log out.
+        //TODO maybe update domain controler
         startActivity(i);
+
       //  updateUI(null);
     }
 

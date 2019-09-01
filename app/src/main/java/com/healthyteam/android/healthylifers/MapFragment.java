@@ -457,14 +457,8 @@ public class MapFragment extends Fragment {
     private void setMyLocationOverlay(){
         myLocationOverlay= new MyLocationNewOverlay(new GpsMyLocationProvider(getContext()),map);
         myLocationOverlay.enableMyLocation();
-
-        if(currLocation!=null)
-            updateLocationUI();
-        else {
-
-            myLocationOverlay.enableFollowLocation();
-            updateLocationUI();
-        }
+        myLocationOverlay.enableFollowLocation();
+        updateLocationUI();
         map.getOverlays().add(this.myLocationOverlay);
     }
     private void setAddLocationListener(){

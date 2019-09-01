@@ -37,6 +37,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
 import com.healthyteam.android.healthylifers.Data.UserData;
+import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.OnGetObjectListener;
 import com.healthyteam.android.healthylifers.Domain.User;
 
 
@@ -202,6 +204,7 @@ public class SignInActivity extends AppCompatActivity {
 
 
     private boolean validateRegisterForm() {
+
         boolean valid = true;
 
         String email = registerEmail.getText().toString();
@@ -238,7 +241,7 @@ public class SignInActivity extends AppCompatActivity {
         }
 
 
-        if(password != passwordRepeat)
+        if(!passwordRepeat.equals(password))
         {
             errorTextRegister.setText("Your passwords must match!");
             errorTextRegister.setVisibility(View.VISIBLE);
@@ -349,17 +352,35 @@ public class SignInActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    updateUI(user);
+                    User user = initializeUser(mAuth.getCurrentUser().getUid());
+                    user.Save();
+                    DomainController.setUser(user);
+                    updateUI();
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                    Toast.makeText(SignInActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
-                    updateUI(null);
+                    Log.w(TAG, task.getException().getMessage() );
+                    circularRegister.setVisibility(View.GONE);
+                    errorTextRegister.setText(task.getException().getMessage());
+                    errorTextRegister.setVisibility(View.VISIBLE);
+                    updateUI();
                 }
             }
         });
+
+    }
+
+
+    private User initializeUser(String uuid)
+    {
+        User user = new User();
+        user.setUID(uuid);
+        user.setName(registerName.getText().toString());
+        user.setSurname(registerSurname.getText().toString());
+        user.setUsername(registerUsername.getText().toString());
+        user.setEmail(registerEmail.getText().toString());
+        user.setPoints(0);
+        return  user;
+
 
     }
 
@@ -380,26 +401,35 @@ public class SignInActivity extends AppCompatActivity {
                     //TODO: create new user, initilize wtih database data, activate it and call DataConttroler.SetUser(...)
                     //TODO: deactivate user when log out
                     Log.d(TAG, "signInWithEmail:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    updateUI(user);
+                    User.getUser(mAuth.getCurrentUser().getUid(), new OnGetObjectListener() {
+                        @Override
+                        public void OnSuccess(Object o) {
+                            DomainController.setUser((User) o);
+                            updateUI();
+                        }});
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.getException());
-                    Toast.makeText(SignInActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
-                    updateUI(null);
+                    circulalSignIn.setVisibility(View.GONE);
+                    errorTextSignin.setText(task.getException().getMessage());
+                    errorTextSignin.setVisibility(View.VISIBLE);
+                    updateUI();
                 }
             }
         });
 
     }
-    private void updateUI(FirebaseUser user) {
+    private void updateUI() {
        // hideProgressDialog();
-        if (user != null) {
+        if (DomainController.getUser() != null) {
 
 
             Intent i = new Intent(getApplicationContext(),MainActivity.class);
             startActivity(i);
+            //TODO: init user when he logs in
+            // User.getUser(<userUID>);
+            // DomainControler.setUser
          /*   mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
                     user.getEmail(), user.isEmailVerified()));
             mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));

@@ -130,7 +130,7 @@ public class MyFriendsFragment extends Fragment {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     for(int i=0;i<devicesArray.size();i++)
                     {
-                        if(device.getAddress() == devicesArray.get(i).getAddress())
+                        if(device.getName().equals(devicesArray.get(i).getName()))
                         {
                             duplicate= true;
                         }
@@ -201,6 +201,7 @@ public class MyFriendsFragment extends Fragment {
                 if(friendToAdd != null)
                 {
                     DomainController.getUser().addFriend(friendToAdd);
+                 //   mBlutetoothConnection.cancel();
                     showToast("Friend accepted.");
                     friendRequestDialog.dismiss();
                     addFriendDialog.dismiss();
@@ -211,7 +212,7 @@ public class MyFriendsFragment extends Fragment {
         rejectFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //   mBlutetoothConnection.cancel();
                 showToast("Friend rejected.");
                 friendRequestDialog.dismiss();
                 addFriendDialog.dismiss();
@@ -292,6 +293,7 @@ public class MyFriendsFragment extends Fragment {
                     mBlutetoothConnection = (ConnectionThread)msg.obj;
                     String uid= DomainController.getUser().getUID();
                     mBlutetoothConnection.write(uid.getBytes());
+
                     break;
                 }
                 case 1:
@@ -302,6 +304,7 @@ public class MyFriendsFragment extends Fragment {
                     friendRequestDialog.show();
                  //   DomainController.getUser().addFriend(message);
                  //   showToast(message);
+
                     break;
                 }
                 case 2:
@@ -321,8 +324,8 @@ public class MyFriendsFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         getContext().unregisterReceiver(mReciever);
-        ServerClass sc = new ServerClass();
-        sc.cancel();
+      //  ServerClass sc = new ServerClass();
+     //   sc.cancel();
         mBlueAdapter.cancelDiscovery();
     }
 

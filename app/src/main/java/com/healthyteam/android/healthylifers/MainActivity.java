@@ -57,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton btnExit;
     private Fragment searchFragment = null;
     private Fragment settingsFragment = null;
-    private Fragment tabInfoFragment;
-    private Fragment tabCommentsFragment;
     private SectionsPageAdapter mSectionPageAdapter;
     private FirebaseAuth mAuth;
     private Button yesLogOut;

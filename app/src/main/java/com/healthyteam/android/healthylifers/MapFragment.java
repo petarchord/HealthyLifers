@@ -177,6 +177,7 @@ public class MapFragment extends Fragment {
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         map = layout_fragment.findViewById(R.id.MapView);
         setCurrentUserLocation();
+        //currLocation = new Location("");
         initMap();
         setLocationSettings();
 
@@ -546,9 +547,11 @@ public class MapFragment extends Fragment {
         configChangeLocationListener();
     }
     private void setCurrentUserLocation(){
-        //TODO: try-catch block. For now exception couse application break which is fine
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            currLocation=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            return;
+        //TODO:EXCEPTION HADNLE: getLastKnownLocation return null when device dont have baffered location
+        //it doesn't depend on permission
+        currLocation=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         String City = DomainController.getCityFromCoo(context, currLocation.getLatitude(),currLocation.getLongitude());
         DomainController.getUser().updateLocation();
         if(DomainController.getUser().updateCity(City))
@@ -632,7 +635,6 @@ public class MapFragment extends Fragment {
         myLocationOverlay.enableMyLocation();
         myLocationOverlay.enableFollowLocation();
         updateLocationUI();
-
         map.getOverlays().add(this.myLocationOverlay);
     }
 

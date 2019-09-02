@@ -12,10 +12,13 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +40,8 @@ import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.User;
 import com.squareup.picasso.Picasso;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import org.w3c.dom.Text;
 
@@ -54,8 +59,11 @@ public class MyFriendsFragment extends Fragment {
     private Button dialogBtnOk;
     private Button dialogBtnCancel;
     private Dialog deleteFriendDialog;
+    private Dialog friendRequestDialog;
     private Button dialogBtnYes;
     private Button dialogBtnNo;
+    private Button acceptFriend;
+    private Button rejectFriend;
     private ImageButton exitAddFriendsDialog;
     private static MyFriendsFragment instance;
     private MyFriendAdapter adapter;
@@ -66,9 +74,11 @@ public class MyFriendsFragment extends Fragment {
     private BluetoothAdapter mBlueAdapter;
     private BroadcastReceiver mReciever;
     private ArrayList<BluetoothDevice> devicesArray;
+    private String friendToAdd;
    // private BluetoothDevice[] btArray;
     private static final String APP_NAME = "HealthyLifers";
     private static final UUID MY_UUID = UUID.fromString("03866f41-7d1e-4d16-96bf-2c6ba69850e4");
+    private ConnectionThread mBlutetoothConnection;
     public static MyFriendsFragment getInstance(){
         if(instance==null)
             instance=new MyFriendsFragment();
@@ -98,6 +108,11 @@ public class MyFriendsFragment extends Fragment {
         addFriendDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         lvAddFriends = addFriendDialog.findViewById(R.id.ListView_BluetoothItems);
         exitAddFriendsDialog = addFriendDialog.findViewById(R.id.closeAddFriendDialog);
+        friendRequestDialog = new Dialog(getContext());
+        friendRequestDialog.setContentView(R.layout.dialog_friend_request);
+        friendRequestDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        acceptFriend = friendRequestDialog.findViewById(R.id.button_accept_friend);
+        rejectFriend = friendRequestDialog.findViewById(R.id.button_reject_friend);
         /*dialogBtnOk = addFriendDialog.findViewById(R.id.button_okDAF);
         dialogBtnCancel=addFriendDialog.findViewById(R.id.button_cancelDAF);*/
 
@@ -109,12 +124,25 @@ public class MyFriendsFragment extends Fragment {
             public void onReceive(Context context, Intent intent) {
             //    String remoteDeviceName = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
                 String action = intent.getAction();
+                boolean duplicate = false;
                 if(BluetoothDevice.ACTION_FOUND.equals(action))
                 {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    devicesArray.add(device);
-                    showToast("Added device with name "+device.getName() +"and MAC address"+device.getAddress()+ "to list");
-                    adapterAddFriends.notifyDataSetChanged();
+                    for(int i=0;i<devicesArray.size();i++)
+                    {
+                        if(device.getAddress() == devicesArray.get(i).getAddress())
+                        {
+                            duplicate= true;
+                        }
+                    }
+                    if(!duplicate)
+                    {
+                        devicesArray.add(device);
+                        showToast("Added device with name "+device.getName() +"and MAC address"+device.getAddress()+ "to list");
+                        adapterAddFriends.notifyDataSetChanged();
+
+                    }
+
                 }
 
 
@@ -122,11 +150,19 @@ public class MyFriendsFragment extends Fragment {
         };
 
         Set<BluetoothDevice> pairedDevices = mBlueAdapter.getBondedDevices();
+        boolean duplicate = false;
 
         if (pairedDevices.size() > 0) {
             // There are paired devices. Get the name and address of each paired device.
-            for (BluetoothDevice device : pairedDevices) {
 
+            for (BluetoothDevice device : pairedDevices) {
+                for(int i=0;i<devicesArray.size();i++)
+                {
+                    if(device.getAddress() == devicesArray.get(i).getAddress())
+                        duplicate=true;
+
+                }
+                if(!duplicate)
                 devicesArray.add(device);
             }
         }
@@ -151,10 +187,35 @@ public class MyFriendsFragment extends Fragment {
         fabAddFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addFriendDialog.show();
+             //   addFriendDialog.show();
+
                 ServerClass serverClass = new ServerClass();
                 serverClass.start();
                 addFriendDialog.show();
+            }
+        });
+
+        acceptFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(friendToAdd != null)
+                {
+                    DomainController.getUser().addFriend(friendToAdd.trim());
+                    showToast("Friend accepted.");
+                    friendRequestDialog.dismiss();
+                    addFriendDialog.dismiss();
+                }
+            }
+        });
+
+        rejectFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showToast("Friend rejected.");
+                friendRequestDialog.dismiss();
+                addFriendDialog.dismiss();
+
             }
         });
         /*dialogBtnOk.setOnClickListener(new View.OnClickListener() {
@@ -219,10 +280,49 @@ public class MyFriendsFragment extends Fragment {
 
     }
 
+
+    public Handler mHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what)
+            {
+                case 0:
+                {
+                    mBlutetoothConnection = (ConnectionThread)msg.obj;
+                    String uid= DomainController.getUser().getUID();
+                    mBlutetoothConnection.write(uid.getBytes());
+                    break;
+                }
+                case 1:
+                {
+
+                    String message=new String((byte[])msg.obj);
+                    friendToAdd = message;
+                    friendRequestDialog.show();
+                 //   DomainController.getUser().addFriend(message);
+                 //   showToast(message);
+                    break;
+                }
+                case 2:
+                {
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    };
+
+
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         getContext().unregisterReceiver(mReciever);
+        ServerClass sc = new ServerClass();
+        sc.cancel();
         mBlueAdapter.cancelDiscovery();
     }
 
@@ -374,16 +474,19 @@ public class MyFriendsFragment extends Fragment {
             {
                 try {
                     socket = serverSocket.accept();
-                    showToast("SERVER: CONNECTING...");
+                  //  showToast("SERVER: CONNECTING...");
+                    Log.e("SERVER", "SERVER: CONNECTING...");
                 } catch (IOException e) {
-                    showToast( "Socket's accept() method failed" +e);
+                   // showToast( "Socket's accept() method failed" +e);
+                    Log.e("SERVER", "Socket's accept() method failed",e);
                     e.printStackTrace();
                 }
 
                 if(socket != null)
                 {
                     //write some code for transmiting the data
-                    showToast("SERVER : STATE_CONNECTED");
+                  //  showToast("SERVER : STATE_CONNECTED");
+                    Log.e("SERVER", "SERVER : STATE_CONNECTED");
                     manageMyConnectedSocket(socket);
                     break;
                 }
@@ -412,7 +515,8 @@ public class MyFriendsFragment extends Fragment {
             try {
                 socket = device.createRfcommSocketToServiceRecord(MY_UUID);
             } catch (IOException e) {
-                showToast( "CLIENT: Socket's create() method failed"+e);
+              //  showToast( "CLIENT: Socket's create() method failed"+e);
+                Log.e("CLIENT", "Socket's create() method failed",e);
                 e.printStackTrace();
             }
         }
@@ -422,9 +526,11 @@ public class MyFriendsFragment extends Fragment {
             mBlueAdapter.cancelDiscovery();
             try {
                 socket.connect();
-                showToast("CLIENT : STATE CONNECTED.");
+                Log.e("CLIENT", "STATE CONNECTED.");
+              //  showToast("CLIENT : STATE CONNECTED.");
             } catch (IOException e) {
-                showToast("CLIENT : STATE CONNECTION FAILED");
+              //  showToast("CLIENT : STATE CONNECTION FAILED");
+                Log.e("CLIENT", "STATE CONNECTION FAILED.",e);
                 e.printStackTrace();
 
                 try
@@ -453,18 +559,89 @@ public class MyFriendsFragment extends Fragment {
     }
 
 
+    public class ConnectionThread extends Thread
+    {
+        BluetoothSocket mBluetoothSocket;
+        Handler mHandler;
+        InputStream mmInStream;
+        OutputStream mmOutStream;
+        byte[] mmBufer;
+
+        public ConnectionThread(BluetoothSocket s,Handler h)
+        {
+            super();
+            mBluetoothSocket=s;
+            mHandler=h;
+            try
+            {
+                mmInStream = mBluetoothSocket.getInputStream();
+                mmOutStream = mBluetoothSocket.getOutputStream();
+            }
+            catch (IOException e)
+            {
+                Log.e("CONNECTION THREAD", "Error occurred while creating the streams", e);
+
+            }
+
+        }
+
+        public void run()
+        {
+            mmBufer = new byte[1024];
+            int numBytes;
+            while(true)
+            {
+                try
+                {
+                    numBytes = mmInStream.read(mmBufer);
+                    Message readMsg = mHandler.obtainMessage(1,numBytes,-1,mmBufer);
+                    readMsg.sendToTarget();
+                    Log.e("CONNECTION THREAD", "Buffer filled with contain from the input stream ");
+                }
+                catch (IOException e)
+                {
+                    Log.e("CONNECTION THREAD", "Input Stream was disconnected", e);
+
+                }
+
+            }
+
+
+        }
+
+        public void write(byte[] bytes)
+        {
+            try
+            {
+                mmOutStream.write(bytes);
+            //    Message writtenMsg = mHandler.obtainMessage(2,-1,-1,mmBufer);
+           //     writtenMsg.sendToTarget();
+            }
+            catch (IOException e)
+            {
+                Log.e("CONNECTION THREAD", "Error occurred when sending data", e);
+            }
+
+
+        }
+
+        public void cancel() {
+            try {
+                mBluetoothSocket.close();
+            } catch (IOException e) {
+                Log.e("CONNECTION THREAD", "Could not close the connect socket", e);
+            }
+        }
+
+    }
+
+
     private void manageMyConnectedSocket(BluetoothSocket s)
     {
        // Log.e("Server-Client","connected socket:"+s);
-        showToast("connected socket:"+s);
-        try
-        {
-            s.close();
-        }
-        catch (IOException io)
-        {
-            showToast("Couldn't close socket:"+io);
-        }
+        ConnectionThread conn = new ConnectionThread(s,mHandler);
+        mHandler.obtainMessage(0,conn).sendToTarget();
+        conn.start();
 
     }
 }

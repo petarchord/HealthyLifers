@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
@@ -36,6 +37,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.healthyteam.android.healthylifers.Data.OnRunTaskListener;
 import com.healthyteam.android.healthylifers.Data.UserData;
+import com.healthyteam.android.healthylifers.Domain.DomainController;
+import com.healthyteam.android.healthylifers.Domain.OnGetObjectListener;
 import com.healthyteam.android.healthylifers.Domain.User;
 
 
@@ -61,6 +64,8 @@ public class SignInActivity extends AppCompatActivity {
     private ImageButton exitRegister;
     private TextView errorTextSignin;
     private TextView errorTextRegister;
+    private ProgressBar circulalSignIn;
+    private ProgressBar circularRegister;
     private Context context;
     private static final String TAG = "SignInActivity";
 
@@ -83,6 +88,7 @@ public class SignInActivity extends AppCompatActivity {
         signinEmail = signInWindow.findViewById(R.id.signinEmail);
         signinPassword = signInWindow.findViewById(R.id.signinPassword);
         errorTextSignin = signInWindow.findViewById(R.id.error_text_signin);
+        circulalSignIn = signInWindow.findViewById(R.id.circular_signin);
         errorTextRegister = registerWindow.findViewById(R.id.error_text_register);
 
         registerEmail = registerWindow.findViewById(R.id.editTextEmailRegister);
@@ -91,6 +97,8 @@ public class SignInActivity extends AppCompatActivity {
         registerUsername = registerWindow.findViewById(R.id.editTextUsernameRegister);
         registerPassword = registerWindow.findViewById(R.id.editTextPassRedgister);
         registerPasswordRepeat = registerWindow.findViewById(R.id.editTextPassRepeatRegister);
+        circularRegister = registerWindow.findViewById(R.id.circular_register);
+
 
         exitSignIn = (ImageButton) signInWindow.findViewById(R.id.closeSignInForm);
         exitRegister = (ImageButton) registerWindow.findViewById(R.id.closeRegisterForm);
@@ -105,8 +113,13 @@ public class SignInActivity extends AppCompatActivity {
               //  Toast.makeText(context,"Sign in clicked!",Toast.LENGTH_SHORT).show();
                 String email = signinEmail.getText().toString();
                 String password = signinPassword.getText().toString();
+                circulalSignIn.setVisibility(View.VISIBLE);
                 if(!validateSigninForm())
+                {
+                    circulalSignIn.setVisibility(View.GONE);
                     return;
+                }
+
                 signIn(email,password);
 
             }
@@ -117,8 +130,13 @@ public class SignInActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email = registerEmail.getText().toString();
                 String password = registerPassword.getText().toString();
+                circularRegister.setVisibility(View.VISIBLE);
                 if(!validateRegisterForm())
+                {
+                    circularRegister.setVisibility(View.GONE);
                     return;
+                }
+
                 createAccount(email,password);
 
             }
@@ -186,6 +204,7 @@ public class SignInActivity extends AppCompatActivity {
 
 
     private boolean validateRegisterForm() {
+
         boolean valid = true;
 
         String email = registerEmail.getText().toString();
@@ -195,6 +214,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerEmail.setError(null);
         }
 
@@ -205,6 +225,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerPassword.setError(null);
         }
 
@@ -215,15 +236,20 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerPasswordRepeat.setError(null);
         }
 
 
-        if(password != passwordRepeat)
+        if(!passwordRepeat.equals(password))
         {
             errorTextRegister.setText("Your passwords must match!");
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
+        }
+        else
+        {
+            errorTextRegister.setVisibility(View.GONE);
         }
 
         String username = registerUsername.getText().toString();
@@ -233,6 +259,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerUsername.setError(null);
         }
 
@@ -243,6 +270,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerName.setError(null);
         }
 
@@ -253,6 +281,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextRegister.setVisibility(View.GONE);
             registerSurname.setError(null);
         }
 
@@ -264,6 +293,10 @@ public class SignInActivity extends AppCompatActivity {
             errorTextRegister.setText("Please enter required fields.");
             errorTextRegister.setVisibility(View.VISIBLE);
             valid = false;
+        }
+        else
+        {
+            errorTextRegister.setVisibility(View.GONE);
         }
 
         return valid;
@@ -281,6 +314,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextSignin.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextSignin.setVisibility(View.GONE);
             signinEmail.setError(null);
         }
 
@@ -291,6 +325,7 @@ public class SignInActivity extends AppCompatActivity {
             errorTextSignin.setVisibility(View.VISIBLE);
             valid = false;
         } else {
+            errorTextSignin.setVisibility(View.GONE);
             signinPassword.setError(null);
         }
 
@@ -317,17 +352,35 @@ public class SignInActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    updateUI(user);
+                    User user = initializeUser(mAuth.getCurrentUser().getUid());
+                    user.Save();
+                    DomainController.setUser(user);
+                    updateUI();
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                    Toast.makeText(SignInActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
-                    updateUI(null);
+                    Log.w(TAG, task.getException().getMessage() );
+                    circularRegister.setVisibility(View.GONE);
+                    errorTextRegister.setText(task.getException().getMessage());
+                    errorTextRegister.setVisibility(View.VISIBLE);
+                    updateUI();
                 }
             }
         });
+
+    }
+
+
+    private User initializeUser(String uuid)
+    {
+        User user = new User();
+        user.setUID(uuid);
+        user.setName(registerName.getText().toString());
+        user.setSurname(registerSurname.getText().toString());
+        user.setUsername(registerUsername.getText().toString());
+        user.setEmail(registerEmail.getText().toString());
+        user.setPoints(0);
+        return  user;
+
 
     }
 
@@ -348,26 +401,35 @@ public class SignInActivity extends AppCompatActivity {
                     //TODO: create new user, initilize wtih database data, activate it and call DataConttroler.SetUser(...)
                     //TODO: deactivate user when log out
                     Log.d(TAG, "signInWithEmail:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    updateUI(user);
+                    User.getUser(mAuth.getCurrentUser().getUid(), new OnGetObjectListener() {
+                        @Override
+                        public void OnSuccess(Object o) {
+                            DomainController.setUser((User) o);
+                            updateUI();
+                        }});
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.getException());
-                    Toast.makeText(SignInActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
-                    updateUI(null);
+                    circulalSignIn.setVisibility(View.GONE);
+                    errorTextSignin.setText(task.getException().getMessage());
+                    errorTextSignin.setVisibility(View.VISIBLE);
+                    updateUI();
                 }
             }
         });
 
     }
-    private void updateUI(FirebaseUser user) {
+    private void updateUI() {
        // hideProgressDialog();
-        if (user != null) {
+        if (DomainController.getUser() != null) {
 
 
             Intent i = new Intent(getApplicationContext(),MainActivity.class);
             startActivity(i);
+            //TODO: init user when he logs in
+            // User.getUser(<userUID>);
+            // DomainControler.setUser
          /*   mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
                     user.getEmail(), user.isEmailVerified()));
             mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));

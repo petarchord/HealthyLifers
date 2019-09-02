@@ -480,8 +480,11 @@ public class User implements  DBReference{
     }
     //TODO: return true can have better position
     public boolean updateCity(String City){
-        if(getCity().equals(City))
+        if(getCity() != null)
+        {
+            if(getCity().equals(City))
             return false;
+        }
         setCity(City);
         try {
             getDatabase().child(Constants.UsersNode).child(getUID()).child(Constants.LocationCityAtt).setValue(City).addOnFailureListener(new OnFailureListener() {

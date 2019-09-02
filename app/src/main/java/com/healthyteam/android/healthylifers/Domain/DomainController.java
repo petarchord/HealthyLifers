@@ -65,6 +65,8 @@ public class DomainController {
         return neighborListeners.remove(listener);
     }
     public static void reinitalizeNeighbors(){
+        if(neighborListeners==null)
+            neighborListeners=new ArrayList<>();
         Neighbors=null;
         getNeighbors(null);
     }

@@ -113,9 +113,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
+
         //TODO: maybe do not initialize map if MapFragment called different way at Activity start
          //region test
-        TestFunctions.setContext(this);
+       /* TestFunctions.setContext(this);
         final User u = TestFunctions.createUser();
         User.signIn("test42@test.com", "test0042", new OnRunTaskListener() {
             @Override
@@ -147,10 +148,9 @@ public class MainActivity extends AppCompatActivity {
                                 MapFragment.getInstance()).commit();}
                 }
             }
-        });
+        });*/
 
-        //testFunction();
-        //endregion
+    //endregion
 
         addItemDialog = new Dialog(this);
         addItemDialog.setContentView(R.layout.dialog_add_item);
@@ -214,7 +214,10 @@ public class MainActivity extends AppCompatActivity {
     private void signOut() {
         mAuth.signOut();
         Intent i = new Intent(getApplicationContext(),SignInActivity.class);
+        //TODO update user account before log out.
+        //TODO maybe update domain controler
         startActivity(i);
+
       //  updateUI(null);
     }
 

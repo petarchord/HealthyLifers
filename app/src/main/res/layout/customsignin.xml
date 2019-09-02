@@ -110,16 +110,28 @@
         android:id="@+id/error_text_signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Forgot Your password?"
+        android:text="Error message"
         android:textSize="18dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
         android:layout_gravity="center"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="5dp"
         android:textColor="@color/colorAccent"
         android:visibility="gone"
 
 
 
+        />
+
+
+    <ProgressBar
+        android:id="@+id/circular_signin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
         />
 
 

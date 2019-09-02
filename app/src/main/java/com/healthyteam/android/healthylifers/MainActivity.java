@@ -157,19 +157,19 @@ public class MainActivity extends AppCompatActivity {
 
         mSectionPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
 
+
         locationViewDialog = new Dialog(this);
         locationViewDialog.setContentView(R.layout.dialog_location_view);
 
         infoButton = locationViewDialog.findViewById(R.id.info_button);
         commentsButton = locationViewDialog.findViewById(R.id.comments_button);
 
-
-
-
-
-
         btnExit = (ImageButton)findViewById(R.id.btnExit);
+
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setSelectedItemId(R.id.navigation_map);
+
         settingsDialog = new Dialog(this);
 
         settingsDialog.setContentView(R.layout.dialog_settings);
@@ -203,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
                 logOutDialog.show();
             }
         });
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         //added this if statement to keep the selected fragment when rotating the device
 

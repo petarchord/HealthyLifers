@@ -385,8 +385,10 @@ public class User implements  DBReference{
             }
         });
     }
-
+    //TODO: get some notification if friend added or not
     public void addFriend(String uid){
+        if(getFriendIndex(uid)!=-1)
+            return;
         data.FriendsIds.add(uid);
         getDatabase().child(Constants.UsersNode).child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

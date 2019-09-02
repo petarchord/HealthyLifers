@@ -158,6 +158,7 @@ public class MyProfileFragment extends Fragment {
         else
             ProfilePic.setImageResource(R.drawable.profile_picture);
 
+
         return fragment_layout;
     }
     void openFileChooser(){

@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
@@ -114,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
+        //TODO: maybe do not initialize map if MapFragment called different way at Activity start
          //region test
         TestFunctions.setContext(this);
         final User u = TestFunctions.createUser();

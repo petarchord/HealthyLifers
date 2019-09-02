@@ -166,8 +166,6 @@ public class MapFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Initialize(inflater,container);
-
-
         return layout_fragment;
 
     }
@@ -299,7 +297,7 @@ public class MapFragment extends Fragment {
             }
             @Override
             public void onListLoaded(List<?> list) {
-                addedMarkers=new HashMap<>();
+
                 if(neighBourHandler!=null)
                     DomainController.removeGetNeighborsListener(neighBourHandler);
                 neighBourHandler=new NeighbourEventHandler();
@@ -664,78 +662,102 @@ public class MapFragment extends Fragment {
 
     }
 
+    private void cleanPreviusMarkers(UserLocationData user){
+        Marker array[] = addedMarkers.get(user.getUID());
+        if(array!=null)
+        {
+            map.getOverlays().remove(array[0]);
+            map.getOverlays().remove(array[1]);
+            addedMarkers.remove(user.getUID());
+        }
+    }
+    private void setUserMarker(UserLocationData user){
+        if(addedMarkers == null)
+            addedMarkers=new HashMap<>();
+        Marker userMarker = new Marker(map);
+        Marker textMarker = new Marker(map);
+        GeoPoint p = new GeoPoint(user.getLatitude(), user.getLongitude());
+        userMarker.setPosition(p);
+        final User friend = DomainController.getUser().getFriendByUid(user.getUID());
+        if (friend != null) {
+            try {
+                userMarker.setIcon(DomainController.drawableFromUrl(friend.getImageUrl()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } else
+            userMarker.setIcon(getResources().getDrawable(R.drawable.profile_picture));
+        userMarker.setIcon(DomainController.resize(getContext(), userMarker.getIcon()));
+        if(friend!=null) {
+            userMarker.setAnchor(0, 1);
+            userMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+                    FriendProfileFragment FriendProfile = new FriendProfileFragment();
+                    FriendProfile.setFriend(friend);
+                    FriendProfile.setPerent(MapFragment.getInstance());
+                    ((MainActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,FriendProfile).commit();
+                    return true;
+                }
+            });
+        }
+        else
+            userMarker.setAnchor(0,(float)0.4);
+        userMarker.setInfoWindow(null);
+        userMarker.setPanToView(false);
+
+        textMarker.setPosition(p);
+        textMarker.setTextIcon(user.getUsername());
+        textMarker.setInfoWindow(null);
+        textMarker.setPanToView(false);
+        textMarker.setAnchor(0,0);
+        map.getOverlays().add(userMarker);
+        map.getOverlays().add(textMarker);
+        Marker array[]={userMarker,textMarker};
+        addedMarkers.put(user.getUID(),array);
+
+
+    }
+    private void setUsertLocationMarker(UserLocation uLocation){
+        if(addedMarkers == null)
+            addedMarkers=new HashMap<>();
+        Marker locationMarker = new Marker(map);
+        Marker textMarker = new Marker(map);
+        GeoPoint p = new GeoPoint(uLocation.getLan(), uLocation.getLon());
+        locationMarker.setPosition(p);
+        //TODO: set icon deppending on the location category
+        locationMarker.setIcon(getResources().getDrawable(R.drawable.profile_picture));
+
+        if(uLocation.getImageUrl()!=null) {
+            locationMarker.setAnchor(0, 1);}
+
+        locationMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                //TODO: open intitialised location view
+                return true;
+            }
+        });
+        locationMarker.setInfoWindow(null);
+        locationMarker.setPanToView(false);
+
+        textMarker.setPosition(p);
+        textMarker.setTextIcon(uLocation.getName());
+        textMarker.setInfoWindow(null);
+        textMarker.setPanToView(false);
+        textMarker.setAnchor(0,0);
+        map.getOverlays().add(locationMarker);
+        map.getOverlays().add(textMarker);
+        Marker array[]={locationMarker,textMarker};
+        addedMarkers.put(uLocation.getUID(),array);
+
+
+    }
+
     //region inner handler classes
     class NeighbourEventHandler implements OnGetListListener {
 
-        private Drawable drawableFromUrl(String urlStr) throws IOException {
-            Bitmap x;
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            URL url = new URL(urlStr);
-            x = BitmapFactory.decodeStream((InputStream)url.getContent());
-            return new BitmapDrawable(Resources.getSystem(), x);
-        }
-        private Drawable resize(Drawable image) {
-            Bitmap b = ((BitmapDrawable)image).getBitmap();
-            Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
-            return new BitmapDrawable(getResources(), bitmapResized);
-        }
-        private void cleanPreviusMarkers(UserLocationData user){
-            Marker array[] = addedMarkers.get(user.getUID());
-            if(array!=null)
-            {
-                map.getOverlays().remove(array[0]);
-                map.getOverlays().remove(array[1]);
-            }
-        }
-        private void setUserMarker(UserLocationData user){
-            if(UserMarkerList == null)
-                UserMarkerList=new LinkedList<Marker>();
-            Marker userMarker = new Marker(map);
-            Marker textMarker = new Marker(map);
-            GeoPoint p = new GeoPoint(user.getLatitude(), user.getLongitude());
-            userMarker.setPosition(p);
-            final User friend = DomainController.getUser().getFriendByUid(user.getUID());
-            if (friend != null) {
-                try {
-                    userMarker.setIcon(drawableFromUrl(friend.getImageUrl()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            } else
-                userMarker.setIcon(getResources().getDrawable(R.drawable.profile_picture));
-            userMarker.setIcon(resize(userMarker.getIcon()));
-            if(friend!=null) {
-                userMarker.setAnchor(0, 1);
-                userMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker, MapView mapView) {
-                        FriendProfileFragment FriendProfile = new FriendProfileFragment();
-                        FriendProfile.setFriend(friend);
-                        FriendProfile.setPerent(MapFragment.getInstance());
-                        ((MainActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,FriendProfile).commit();
-                        return true;
-                    }
-                });
-            }
-            else
-                userMarker.setAnchor(0,(float)0.4);
-            userMarker.setInfoWindow(null);
-            userMarker.setPanToView(false);
-
-            textMarker.setPosition(p);
-            textMarker.setTextIcon(user.getUsername());
-            textMarker.setInfoWindow(null);
-            textMarker.setPanToView(false);
-            textMarker.setAnchor(0,0);
-            map.getOverlays().add(userMarker);
-            map.getOverlays().add(textMarker);
-            Marker array[]={userMarker,textMarker};
-            addedMarkers.put(user.getUID(),array);
-
-
-        }
         @Override
         public void onChildAdded(List<?> list, int index) {
             UserLocationData user = (UserLocationData) list.get(index);
@@ -771,6 +793,7 @@ public class MapFragment extends Fragment {
 
         }
     }
+
     //function should recive Location parametar in the future
     class OsmLocationHandler implements LocationListener
     {

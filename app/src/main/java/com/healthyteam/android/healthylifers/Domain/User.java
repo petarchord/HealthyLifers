@@ -50,6 +50,8 @@ public class User implements  DBReference{
 
     public User(){
         data = new UserData();
+        friendList=new ArrayList<>();
+        Posts = new ArrayList<>();
         }
 
 
@@ -58,8 +60,6 @@ public class User implements  DBReference{
 
     //region db related
     public int getFriendIndex(String uid){
-        if(friendList==null)
-            return  -1;
         for(int i=0; i<friendList.size();i++){
             if(friendList.get(i).getUID().equals(uid))
                 return i;
@@ -289,8 +289,7 @@ public class User implements  DBReference{
     }
 
     private void getFriendList(final OnGetListListener listener) {
-        if(friendList==null){
-            friendList=new ArrayList<>();
+        if(friendList.size()==0){
             for(final String friendId:this.getFriendsIds())
             {
                 getFriend(friendId, new OnGetObjectListener() {
@@ -356,21 +355,28 @@ public class User implements  DBReference{
         else
             listener.onListLoaded(Posts);
     }
-    //TODO: look up for how date will be added to new location. It need to be date of adding moment
-    public void addPost(final UserLocation post)//funciton initialize post UID
+    //TODO: W: addPost and addFriend added new object to potentially non-initialize list which can cause error in future
+    public void addPost(final UserLocation post)
     {
         if(post==null)
             return;
-        String key = getDatabase().child(Constants.LocationsNode).push().getKey();
-        post.setUID(key);
-        post.Save(new OnSuccessListener() {
+        Map<String, Object> PostIdsMap = new HashMap<>();
+        getPostsIds().add(post.getUID());
+        PostIdsMap.put(Constants.UserPostIdsAtt,getPostsIds());
+
+        getDatabase().child(Constants.UsersNode).child(getUID()).updateChildren(PostIdsMap).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onSuccess(Object o) {
-                getPostsIds().add(post.getUID());
-                Save();
+            public void onFailure(@NonNull Exception e) {
+                Log.println(Log.WARN, "Database:", e.getMessage());
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.println(Log.WARN, "Database: ", "Success");
                 Posts.add(post);
             }
         });
+
 
     }
     public void removePost(final UserLocation post)//post argument is element of Posts list
@@ -460,7 +466,7 @@ public class User implements  DBReference{
         try {
             Map<String, Object> LocationValues = new HashMap<>();
             LocationValues.put(Constants.LocationLatitudeAtt,getLatitude());
-            LocationValues.put(Constants.LocationLongitutdeAtt,getLongitude());
+            LocationValues.put(Constants.LocationLongitudeAtt,getLongitude());
 
             getDatabase().child(Constants.UsersNode).child(getUID()).updateChildren(LocationValues).addOnFailureListener(new OnFailureListener() {
                 @Override

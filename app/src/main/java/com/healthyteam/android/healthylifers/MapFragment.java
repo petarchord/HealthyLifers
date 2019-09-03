@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.res.ColorStateList;
@@ -312,7 +313,9 @@ public class MapFragment extends Fragment {
         });
 
     }
+    //region dialog_view_item
 
+    //end region
     //region dialog_add_item
     void initAddLocatonDialogElement(Dialog addLocationDialog){
         cbEvent = addLocationDialog.findViewById(R.id.cbEvent);
@@ -326,18 +329,31 @@ public class MapFragment extends Fragment {
         etLocationTags = addLocationDialog.findViewById(R.id.EditText_TagsDAI);
         closeAddItem = (ImageButton) addItemDialog.findViewById(R.id.ImageButton_closeAddItem);
 
-        ImageView imgViewLocation = addLocationDialog.findViewById(R.id.ImageView_LocationPic);
+        addLocationDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                clearAddLocationView();
+            }
+        });
+        imgViewLocation = addLocationDialog.findViewById(R.id.ImageView_LocationPic);
 
 
     }
-
+    void clearAddLocationView(){
+        etLocationDesc.getText().clear();
+        etLocationName.getText().clear();
+        etLocationTags.getText().clear();
+        cbCourt.setChecked(false);
+        cbEvent.setChecked(false);
+        cbFitnessCenter.setChecked(false);
+        cbHealthyFood.setChecked(false);
+    }
     void configAddLocationDialogElements(){
         final UserLocation newLocation = new UserLocation();
         cbEvent.setOnCheckedChangeListener(createAddLocationCbListener(newLocation));
         cbCourt.setOnCheckedChangeListener(createAddLocationCbListener(newLocation));
         cbFitnessCenter.setOnCheckedChangeListener(createAddLocationCbListener((newLocation)));
         cbHealthyFood.setOnCheckedChangeListener(createAddLocationCbListener(newLocation));
-
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -377,6 +393,7 @@ public class MapFragment extends Fragment {
                             break;
 
                     }
+
                     //TODO: disable/enable rest ckBoxes
                 }
             }
@@ -387,15 +404,15 @@ public class MapFragment extends Fragment {
         location.setAuthor(DomainController.getUser());
         location.setDescripition(etLocationDesc.getText().toString());
         location.setName(etLocationName.getText().toString());
-        IGeoPoint PointCenter = map.getMapCenter();
-        location.setLon(PointCenter.getLongitude());
-        location.setLat(PointCenter.getLatitude());
+        location.setLon(currLocation.getLongitude());
+        location.setLat(currLocation.getLatitude());
+        location.setDateAdded(DomainController.getCurrentDate());
         location.setCity(DomainController.getCityFromCoo(context,currLocation.getLatitude(),currLocation.getLongitude()));
 
         location.setTagListFromString(etLocationTags.getText().toString());
         SaveNewLocation(location);
     }
-    void SaveNewLocation(UserLocation location){
+    void SaveNewLocation(final UserLocation location){
         if(LocationPicUri!=null){
             location.UpdatePicture(LocationPicUri, new OnUploadDataListener() {
                 @Override
@@ -406,6 +423,8 @@ public class MapFragment extends Fragment {
                 @Override
                 public void onSuccess() {
                     //TODO: set Location icon map
+                    setUsertLocationMarker(location);
+                    DomainController.getUser().addPost(location);
                     addItemDialog.dismiss();
                     LocationPicUri=null;
                 }
@@ -422,6 +441,8 @@ public class MapFragment extends Fragment {
                 public void onSuccess(Object o) {
                     addItemDialog.dismiss();
                     //TODO: set Location icon on map
+                    setUsertLocationMarker(location);
+                    DomainController.getUser().addPost(location);
                 }
             });
         }
@@ -516,20 +537,6 @@ public class MapFragment extends Fragment {
         }
     }
 
-
-    private void pickLocationOptionOff(){
-        int color = getResources().getColor(R.color.colorPrimary);
-        fabAddLocation.setBackgroundTintList(ColorStateList.valueOf(color));
-        fabAddLocation.setImageResource(R.drawable.baseline_add_location_24_red_dark);
-        addPlace=false;
-
-    }
-    private void pickLocationOptionOn(){
-        int color = getResources().getColor(R.color.colorPrimaryLighter);
-        fabAddLocation.setBackgroundTintList(ColorStateList.valueOf(color));
-        fabAddLocation.setImageResource(R.drawable.baseline_add_location_24_red_light);
-        addPlace=true;
-    }
 
     public static MapFragment getInstance(){
         if(instance==null)
@@ -638,31 +645,6 @@ public class MapFragment extends Fragment {
         map.getOverlays().add(this.myLocationOverlay);
     }
 
-    private void setTestMarker( GeoPoint p){
-        Marker likeMarker = new Marker(map);
-        likeMarker.setPosition(p);
-        likeMarker.setIcon(getResources().getDrawable(R.drawable.baseline_thumb_up_24_green));
-
-
-        likeMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker, MapView mapView) {
-                Toast.makeText(context,marker.getPosition().getLatitude() + " - "+marker.getPosition().getLongitude(),Toast.LENGTH_LONG).show();
-                Log.println(Log.INFO,"Map", "latitude: " + marker.getPosition().getLatitude()+ ", "
-                        + "longitude: " + marker.getPosition().getLongitude());
-                return true;
-            }
-        });
-
-        map.getOverlays().add(likeMarker);
-        Marker textMarker = new Marker(map);
-        textMarker.setPosition(p);
-        textMarker.setTextIcon("TEXT");
-        textMarker.setAnchor(0,(float)0);
-        map.getOverlays().add(textMarker);
-
-
-    }
 
     private void cleanPreviusMarkers(UserLocationData user){
         Marker array[] = addedMarkers.get(user.getUID());
@@ -687,12 +669,6 @@ public class MapFragment extends Fragment {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-        } else
-            userMarker.setIcon(getResources().getDrawable(R.drawable.profile_picture));
-        userMarker.setIcon(DomainController.resize(getContext(), userMarker.getIcon()));
-        if(friend!=null) {
-            userMarker.setAnchor(0, 1);
             userMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
@@ -704,8 +680,15 @@ public class MapFragment extends Fragment {
                 }
             });
         }
+        if(friend ==null || friend.getImageUrl()==null)
+            userMarker.setIcon(getResources().getDrawable(R.drawable.profile_picture));
+
+        userMarker.setIcon(DomainController.resize(getContext(), userMarker.getIcon()));
+        if(friend!=null)
+            userMarker.setAnchor(0, 1);
         else
             userMarker.setAnchor(0,(float)0.4);
+
         userMarker.setInfoWindow(null);
         userMarker.setPanToView(false);
 
@@ -721,6 +704,15 @@ public class MapFragment extends Fragment {
 
 
     }
+    private int getLocationIconResurce(UserLocation.Category category){
+        switch (category){
+            case EVENT: return R.drawable.flag_triangle;
+            case COURT: return R.drawable.soccer_field;
+            case HEALTHYFOOD: return R.drawable.store;
+            case FITNESSCENTER: return R.drawable.dumbbell;
+            default: return R.drawable.ic_dashboard_black_24dp;
+        }
+    }
     private void setUsertLocationMarker(UserLocation uLocation){
         if(addedMarkers == null)
             addedMarkers=new HashMap<>();
@@ -728,16 +720,15 @@ public class MapFragment extends Fragment {
         Marker textMarker = new Marker(map);
         GeoPoint p = new GeoPoint(uLocation.getLan(), uLocation.getLon());
         locationMarker.setPosition(p);
-        //TODO: set icon deppending on the location category
-        locationMarker.setIcon(getResources().getDrawable(R.drawable.profile_picture));
 
-        if(uLocation.getImageUrl()!=null) {
-            locationMarker.setAnchor(0, 1);}
+        locationMarker.setIcon(getResources().getDrawable(getLocationIconResurce(uLocation.getCategory())));
+        locationMarker.setAnchor(0,(float)1);
 
         locationMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 //TODO: open intitialised location view
+
                 return true;
             }
         });

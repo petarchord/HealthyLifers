@@ -9,11 +9,12 @@ public class Constants {
     public static final String UserPointsAtt = "Points";
     public static final String UserFriendIdsAtt = "FriendIds";
     public static final String UserActiveAtt="Active";
+    public static final String UserPostIdsAtt="PostsIds";
     public static final String UserCityAtt="City";
 
     public static final String LocationCategoryAtt="Category";
     public static final String LocationLatitudeAtt="Latitude";
-    public static final String LocationLongitutdeAtt="Longitude";
+    public static final String LocationLongitudeAtt ="Longitude";
     public static final String LocationCityAtt = "City";
     public static final Integer showUserCount = 30;
     public static final Integer LocationCategoryEvent = UserLocation.Category.EVENT.ordinal();

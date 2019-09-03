@@ -1,8 +1,14 @@
 package com.healthyteam.android.healthylifers.Domain;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -19,7 +25,13 @@ import com.healthyteam.android.healthylifers.Data.OnGetDataListener;
 import com.healthyteam.android.healthylifers.Data.UserData;
 import com.healthyteam.android.healthylifers.Data.UserLocationData;
 
+import org.osmdroid.views.overlay.Marker;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -244,6 +256,7 @@ public class DomainController {
             }
         });
     }
+
     public static String getCityFromCoo(Context context, Double latitude, Double longitude){
         try {
             Geocoder geocoder = new Geocoder(context, Locale.getDefault());
@@ -255,4 +268,18 @@ public class DomainController {
         }
         return "Error";
     }
+    public static Drawable drawableFromUrl(String urlStr) throws IOException {
+        Bitmap x;
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        URL url = new URL(urlStr);
+        x = BitmapFactory.decodeStream((InputStream)url.getContent());
+        return new BitmapDrawable(Resources.getSystem(), x);
+    }
+    public static Drawable resize(Context context, Drawable image) {
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
+        return new BitmapDrawable(context.getResources(), bitmapResized);
+    }
+
 }

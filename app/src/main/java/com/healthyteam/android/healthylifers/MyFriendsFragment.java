@@ -200,8 +200,9 @@ public class MyFriendsFragment extends Fragment {
             public void onClick(View v) {
                 if(friendToAdd != null)
                 {
-                    DomainController.getUser().addFriend(friendToAdd);
-                 //   mBlutetoothConnection.cancel();
+
+                    DomainController.getUser().addFriend(friendToAdd.trim());
+                    //   mBlutetoothConnection.cancel();
                     showToast("Friend accepted.");
                     friendRequestDialog.dismiss();
                     addFriendDialog.dismiss();

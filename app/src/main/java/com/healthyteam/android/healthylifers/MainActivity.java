@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
@@ -113,6 +112,43 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        //TODO: maybe do not initialize map if MapFragment called different way at Activity start
+         //region test
+       /* TestFunctions.setContext(this);
+        final User u = TestFunctions.createUser();
+        User.signIn("test42@test.com", "test0042", new OnRunTaskListener() {
+            @Override
+            public void OnStart() {
+
+            }
+
+            @Override
+            public void OnComplete(Task<?> task) {
+                if(task.isSuccessful()){
+                    User.getUser(mAuth.getCurrentUser().getUid(), new OnGetObjectListener() {
+                        @Override
+                        public void OnSuccess(Object o) {
+                            DomainController.setUser((User) o);
+                            if (savedInstanceState == null) {
+                                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                                        MapFragment.getInstance()).commit();
+                            }
+                        }
+                    });
+                }
+                else{
+                    //TODO: error message
+                    //below is test region
+                    createNewUser(u);
+                    DomainController.setUser(u);
+                    if (savedInstanceState == null) {
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                                MapFragment.getInstance()).commit();}
+                }
+            }
+        });*/
+
+    //endregion
 
         addItemDialog = new Dialog(this);
         addItemDialog.setContentView(R.layout.dialog_add_item);

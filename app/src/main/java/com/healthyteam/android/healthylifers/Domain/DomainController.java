@@ -30,7 +30,9 @@ import org.osmdroid.views.overlay.Marker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -267,6 +269,11 @@ public class DomainController {
             Log.println(Log.ERROR,"Geocoder", e.getMessage());
         }
         return "Error";
+    }
+    public static String getCurrentDate(){
+        SimpleDateFormat formatter= new SimpleDateFormat("dd-MM-yyyy");
+        Date date = new Date(System.currentTimeMillis());
+        return formatter.format(date);
     }
     public static Drawable drawableFromUrl(String urlStr) throws IOException {
         Bitmap x;

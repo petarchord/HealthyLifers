@@ -400,8 +400,8 @@ public class User implements  DBReference{
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = new User();
-                user.setUID(dataSnapshot.getKey());
                 user.setData(dataSnapshot.getValue(UserData.class));
+                user.setUID(dataSnapshot.getKey());
                 friendList.add(user);
                 Save();
                 for(OnGetListListener listener:friendListeners)

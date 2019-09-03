@@ -172,9 +172,25 @@ public class MyProfileFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
-            mImageUri = data.getData();
             Log.i("onChoosePic:", mImageUri.getPath());
+            mImageUri = data.getData();
             ProfilePic.setImageURI(mImageUri);
+            DomainController.getUser().UpdatePicture(mImageUri, new OnUploadDataListener() {
+                @Override
+                public void onStart() {
+
+                }
+
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailed(Exception e) {
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
     //region test

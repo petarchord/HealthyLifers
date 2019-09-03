@@ -163,6 +163,15 @@ public class UserLocation {
     public List<String> getTagList() {
         return Data.Tags;
     }
+    public String getTagsString(){
+        String result="";
+        int i;
+        for(i=0;i<getTagList().size()-1;i++){
+            result += getTagList().get(i)+ ", ";
+        }
+            result+=getTagList().get(i);
+        return result;
+    }
 
     public Integer getLikeCount() {
         return Data.likedBy.size();

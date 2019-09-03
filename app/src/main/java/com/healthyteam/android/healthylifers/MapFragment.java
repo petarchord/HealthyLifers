@@ -68,6 +68,7 @@ import com.healthyteam.android.healthylifers.Domain.Comment;
 import com.healthyteam.android.healthylifers.Domain.User;
 import com.healthyteam.android.healthylifers.Domain.UserLocation;
 import com.karumi.dexter.BuildConfig;
+import com.squareup.picasso.Picasso;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -118,31 +119,45 @@ public class MapFragment extends Fragment {
     private LocationSettingsRequest mLocationSettingsRequest;
     private LocationRequest mLocationRequest;
 
-    private Dialog addItemDialog;
+
+
+
     private Dialog locationViewDialog;
-    private Dialog addCommentDialog;
-    private ImageButton closeCommentDialog;
-    private Fragment tabInfoFragment;
-    private Fragment tabCommentsFragment;
+    //locationView element
+    private LinearLayout layoutInfo;
+    private LinearLayout layoutComments;
+    private ImageButton closeLocationView;
     private Button infoButton;
     private Button commentsButton;
     private Button addCommentButton;
-    private ImageButton closeLocationView;
+    private ImageView imgViewLocationPic;
+    private ImageView imgViewAuthorPic;
+    private ImageView imgViewCategory;
+    private TextView txtLocationName;
+    private TextView txtAuthorName;
+    private TextView txtLikeNum;
+    private TextView txtDislikeNum;
+    private TextView txtLocationDesc;
+    private TextView txtLocationTags;
+
+
+
+
+    private Dialog addCommentDialog;
+    private ImageButton closeCommentDialog;
+
+
+
     private ListView commentListView;
     private ArrayList<Comment> commentsArray;
 
 
 
-
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
-    private ImageButton closeAddItem;
     private SectionsPageAdapter mSectionPageAdapter;
 
     private OnGetListListener getNeighborListener;
 
-    private LinearLayout layoutInfo;
-    private LinearLayout layoutComments;
+
 
 
     private boolean addPlace = false;
@@ -150,18 +165,22 @@ public class MapFragment extends Fragment {
     private List<Marker> UserMarkerList;
     private NeighbourEventHandler neighBourHandler;
 
+
+    private Dialog addItemDialog;
     //dialog_add_item views
-    CheckBox cbEvent;
-    CheckBox cbCourt;
-    CheckBox cbFitnessCenter;
-    CheckBox cbHealthyFood;
-    Button btnPost;
-    Button btnAddImage;
-    ImageView imgViewLocation;
-    EditText etLocationName;
-    EditText etLocationDesc;
-    EditText etLocationTags;
-    Uri LocationPicUri;
+    private CheckBox cbEvent;
+    private CheckBox cbCourt;
+    private CheckBox cbFitnessCenter;
+    private CheckBox cbHealthyFood;
+    private Button btnPost;
+    private Button btnAddImage;
+    private ImageButton closeAddItem;
+    private ImageView imgViewLocation;
+    private EditText etLocationName;
+    private EditText etLocationDesc;
+    private EditText etLocationTags;
+    private Uri LocationPicUri;
+
     private static final int PICK_IMAGE_REQUEST = 1;
     @Nullable
     @Override
@@ -178,87 +197,17 @@ public class MapFragment extends Fragment {
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         map = layout_fragment.findViewById(R.id.MapView);
         setCurrentUserLocation();
-        //currLocation = new Location("");
         initMap();
         setLocationSettings();
-
-        //setAddLocationListener();
 
         addItemDialog = new Dialog(getContext());
         addItemDialog.setContentView(R.layout.dialog_add_item);
 
-
-        addCommentDialog = new Dialog(getContext());
-        addCommentDialog.setContentView(R.layout.dialog_add_comment);
-
-        closeCommentDialog = addCommentDialog.findViewById(R.id.closeCommentDialog);
-
-
-
         locationViewDialog = new Dialog(context);
         locationViewDialog.setContentView(R.layout.dialog_location_view);
-        closeLocationView = locationViewDialog.findViewById(R.id.closeLocationDialog);
-        addCommentButton = locationViewDialog.findViewById(R.id.addCommentButton);
-        layoutInfo = locationViewDialog.findViewById(R.id.layout_info);
-        layoutComments = locationViewDialog.findViewById(R.id.layout_comments);
 
-        commentListView = locationViewDialog.findViewById(R.id.comment_listView);
+        //TODO: initialize comment list
         commentsArray = new ArrayList<>();
-
-
-        infoButton = locationViewDialog.findViewById(R.id.info_button);
-        commentsButton = locationViewDialog.findViewById(R.id.comments_button);
-
-        infoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                commentsButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
-                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
-                layoutComments.setVisibility(View.GONE);
-                layoutComments.invalidate();
-                layoutInfo.setVisibility(View.VISIBLE);
-                layoutInfo.invalidate();
-
-            }
-        });
-
-        commentsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                infoButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
-                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
-                layoutComments.setVisibility(View.VISIBLE);
-                layoutComments.invalidate();
-                layoutInfo.setVisibility(View.GONE);
-                layoutInfo.invalidate();
-
-            }
-        });
-
-        addCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addCommentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                addCommentDialog.show();
-            }
-        });
-
-        closeLocationView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                locationViewDialog.dismiss();
-            }
-        });
-
-        closeCommentDialog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addCommentDialog.dismiss();
-            }
-        });
-
-
 
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,6 +265,98 @@ public class MapFragment extends Fragment {
     //region dialog_view_item
 
     //end region
+    void initLocationViewDialogElement(){
+        locationViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        closeLocationView = locationViewDialog.findViewById(R.id.closeLocationDialog);
+
+        layoutInfo = locationViewDialog.findViewById(R.id.layout_info);
+        infoButton = locationViewDialog.findViewById(R.id.info_button);
+        imgViewLocationPic =locationViewDialog.findViewById(R.id.ImageView_LocationPicDLV);
+        imgViewAuthorPic = locationViewDialog.findViewById(R.id.ImageView_AuthorDLV);
+        imgViewCategory = locationViewDialog.findViewById(R.id.ImageView_CategoryDLV);
+        txtLocationName =locationViewDialog.findViewById(R.id.TextView_LocationNameDLV);
+        txtAuthorName = locationViewDialog.findViewById(R.id.TextView_AuthorDLV);
+        txtLikeNum=locationViewDialog.findViewById(R.id.TextView_likeNumDLV);
+        txtDislikeNum = locationViewDialog.findViewById(R.id.TextView_dislikenumDLV);
+        txtLocationDesc = locationViewDialog.findViewById(R.id.TextView_LocationDescDLV);
+        txtLocationTags = locationViewDialog.findViewById(R.id.TextView_TagsDLV);
+
+
+        layoutComments = locationViewDialog.findViewById(R.id.layout_comments);
+        commentsButton = locationViewDialog.findViewById(R.id.comments_button);
+        addCommentButton = locationViewDialog.findViewById(R.id.addCommentButton);
+
+        commentListView = locationViewDialog.findViewById(R.id.ListView_CommentsDLV);
+        addCommentDialog = new Dialog(getContext());
+        addCommentDialog.setContentView(R.layout.dialog_add_comment);
+        closeCommentDialog = addCommentDialog.findViewById(R.id.closeCommentDialog);
+    }
+    void setLocationVIewElementContent(UserLocation location){
+        if(location.getImageUrl()!=null)
+            Picasso.get().load(location.getImageUrl()).into(imgViewLocationPic);
+        imgViewAuthorPic.setImageResource(R.drawable.profile_picture);
+        imgViewCategory.setImageResource(getLocationIconResurce(location.getCategory()));
+        //TODO: getAuthor name
+        txtLocationName.setText(location.getName());
+        txtLocationDesc.setText(location.getDescripition());
+        txtLocationTags.setText(location.getTagsString());
+        txtLikeNum.setText(location.getLikeCountString());
+        txtDislikeNum.setText(location.getDislikeCountString());
+    }
+    void setLocationViewDialogElementListener(){
+
+        closeLocationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locationViewDialog.dismiss();
+            }
+        });
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                commentsButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
+                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
+                layoutComments.setVisibility(View.GONE);
+                layoutComments.invalidate();
+                layoutInfo.setVisibility(View.VISIBLE);
+                layoutInfo.invalidate();
+
+            }
+        });
+
+        commentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                infoButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
+                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
+                layoutComments.setVisibility(View.VISIBLE);
+                layoutComments.invalidate();
+                layoutInfo.setVisibility(View.GONE);
+                layoutInfo.invalidate();
+
+            }
+        });
+
+        addCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCommentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                addCommentDialog.show();
+            }
+        });
+
+
+        closeCommentDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCommentDialog.dismiss();
+            }
+        });
+
+
+
+    }
     //region dialog_add_item
     void initAddLocatonDialogElement(Dialog addLocationDialog){
         cbEvent = addLocationDialog.findViewById(R.id.cbEvent);
@@ -422,7 +463,6 @@ public class MapFragment extends Fragment {
 
                 @Override
                 public void onSuccess() {
-                    //TODO: set Location icon map
                     setUsertLocationMarker(location);
                     DomainController.getUser().addPost(location);
                     addItemDialog.dismiss();
@@ -440,7 +480,6 @@ public class MapFragment extends Fragment {
                 @Override
                 public void onSuccess(Object o) {
                     addItemDialog.dismiss();
-                    //TODO: set Location icon on map
                     setUsertLocationMarker(location);
                     DomainController.getUser().addPost(location);
                 }
@@ -713,7 +752,7 @@ public class MapFragment extends Fragment {
             default: return R.drawable.ic_dashboard_black_24dp;
         }
     }
-    private void setUsertLocationMarker(UserLocation uLocation){
+    private void setUsertLocationMarker(final UserLocation uLocation){
         if(addedMarkers == null)
             addedMarkers=new HashMap<>();
         Marker locationMarker = new Marker(map);
@@ -727,8 +766,10 @@ public class MapFragment extends Fragment {
         locationMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
-                //TODO: open intitialised location view
-
+                initLocationViewDialogElement();
+                setLocationVIewElementContent(uLocation);
+                setLocationViewDialogElementListener();
+                locationViewDialog.show();
                 return true;
             }
         });

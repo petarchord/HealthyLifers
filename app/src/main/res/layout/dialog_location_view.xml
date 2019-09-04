@@ -31,6 +31,7 @@
             android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/ImageView_LocationPicDLV"
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
                 android:background="#FFFFFF"
@@ -54,6 +55,7 @@
             >
 
             <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/TextView_LocationNameDLV"
                 android:layout_marginLeft="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -90,6 +92,7 @@
             android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/TextView_likeNumDLV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="45"
@@ -100,6 +103,7 @@
                 />
 
             <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/TextView_dislikenumDLV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="5"
@@ -117,6 +121,7 @@
             android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/ImageView_AuthorDLV"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="#FFFFFF"
@@ -126,6 +131,7 @@
                 />
 
             <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/TextView_AuthorDLV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Some user"
@@ -167,7 +173,8 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+           >
 
 
             <LinearLayout
@@ -223,18 +230,12 @@
                     android:layout_marginTop="10dp">
 
                     <ImageView
+                        android:id="@+id/ImageView_CategoryDLV"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/dumbbell"
                         android:layout_marginLeft="20dp"
                         />
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/store"
-                        android:layout_marginLeft="10dp"
-                        />
 
                 </LinearLayout>
 
@@ -307,7 +308,7 @@
                 <ListView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/comment_listView"
+                    android:id="@+id/ListView_CommentsDLV"
 
                     >
 

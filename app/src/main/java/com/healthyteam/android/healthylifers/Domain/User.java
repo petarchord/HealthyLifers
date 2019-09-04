@@ -289,6 +289,8 @@ public class User implements  DBReference{
     }
 
     private void getFriendList(final OnGetListListener listener) {
+        if(getFriendsIds().size()==0)
+            listener.onListLoaded(friendList);
         if(friendList.size()==0){
             for(final String friendId:this.getFriendsIds())
             {
@@ -400,8 +402,8 @@ public class User implements  DBReference{
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = new User();
-                user.setUID(dataSnapshot.getKey());
                 user.setData(dataSnapshot.getValue(UserData.class));
+                user.setUID(dataSnapshot.getKey());
                 friendList.add(user);
                 Save();
                 for(OnGetListListener listener:friendListeners)
@@ -425,6 +427,7 @@ public class User implements  DBReference{
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = new User();
                 user.setData(dataSnapshot.getValue(UserData.class));
+                user.setUID(dataSnapshot.getKey());
                 user.getFriendsIds().remove(getUID());
                 user.Save();
                 Save();

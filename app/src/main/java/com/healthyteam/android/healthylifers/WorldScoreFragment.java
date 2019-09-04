@@ -30,6 +30,9 @@ public class WorldScoreFragment extends Fragment {
             instance=new WorldScoreFragment();
         return instance;
     }
+    public static void Restart(){
+        instance=null;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

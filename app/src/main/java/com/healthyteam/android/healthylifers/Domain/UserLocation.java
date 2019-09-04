@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class UserLocation {
+public class UserLocation implements DBReference {
     public static enum Category {
         EVENT, HEALTHYFOOD, COURT, FITNESSCENTER
     }
@@ -163,6 +163,18 @@ public class UserLocation {
     public List<String> getTagList() {
         return Data.Tags;
     }
+    public String getTagsString(){
+
+        String result="";
+        if(getTagList().size()>0) {
+            int i;
+            for (i = 0; i < getTagList().size() - 1; i++) {
+                result += getTagList().get(i) + ", ";
+            }
+            result += getTagList().get(i);
+        }
+        return result;
+    }
 
     public Integer getLikeCount() {
         return Data.likedBy.size();
@@ -174,7 +186,7 @@ public class UserLocation {
     }
     public String getDislikeCountString(){return String.valueOf(Data.DislikedBy.size());}
 
-    public Double getLan() {
+    public Double getLat() {
         return Data.Latitude;
     }
 

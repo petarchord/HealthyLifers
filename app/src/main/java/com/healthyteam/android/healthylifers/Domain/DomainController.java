@@ -21,11 +21,14 @@ import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.healthyteam.android.healthylifers.Data.LocationData;
 import com.healthyteam.android.healthylifers.Data.OnGetDataListener;
 import com.healthyteam.android.healthylifers.Data.UserData;
 import com.healthyteam.android.healthylifers.Data.UserLocationData;
-
-import org.osmdroid.views.overlay.Marker;
+import com.healthyteam.android.healthylifers.MapFragment;
+import com.healthyteam.android.healthylifers.MyFriendsFragment;
+import com.healthyteam.android.healthylifers.MyProfileFragment;
+import com.healthyteam.android.healthylifers.WorldScoreFragment;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +36,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,14 +49,31 @@ public class DomainController {
     }
     static private List<User> WorldScoreUsers;
     static private List<UserLocationData> Neighbors;
+    static private List<UserLocation> NeighborLocations;
     public static User getUser(){
         return UserInstance;
     }
     public static void setUser(User user){
         UserInstance=user;
     }
+    public static void Logout(){
+        UserInstance=null;
+        Neighbors=null;
+        NeighborLocations=null;
+        neighborListeners=null;
+        neighborLocationListeners=null;
+        WorldScoreUsers=null;
+        worldScoreListeners=null;
+        mDatabase=null;
+        MapFragment.Restart();
+        MyProfileFragment.Restart();
+        MyFriendsFragment.Restart();
+        WorldScoreFragment.Restart();
+
+    }
     private static List<OnGetListListener> worldScoreListeners;
     private static List<OnGetListListener> neighborListeners;
+    private static List<OnGetListListener> neighborLocationListeners;
 
 
     public static void addGetNeigborsListener(OnGetListListener listener){
@@ -99,7 +118,7 @@ public class DomainController {
                     User u = new User();
                     u.setData(dataSnapshot.getValue(UserData.class));
                     String uid= dataSnapshot.getKey();
-                    int uIndex = getUserIndex(uid, Neighbors);
+                    int uIndex = getIndexWithUid(uid, Neighbors);
                     if (uIndex != -1) {
                         Neighbors.get(uIndex).setLatitude(u.getLatitude());
                         Neighbors.get(uIndex).setLongitude(u.getLongitude());
@@ -113,7 +132,7 @@ public class DomainController {
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                     String uid = dataSnapshot.getKey();
-                    int uIndex = getUserIndex(uid,Neighbors);
+                    int uIndex = getIndexWithUid(uid,Neighbors);
                     if (uIndex != -1) {
                         UserLocationData u = Neighbors.get(uIndex);
                         Neighbors.remove(uIndex);
@@ -141,6 +160,88 @@ public class DomainController {
         else
             listener.onListLoaded(Neighbors);
     }
+
+    public static void addGetNeigborLocationListener(OnGetListListener listener){
+        if(neighborLocationListeners==null)
+            neighborLocationListeners=new ArrayList<>();
+        neighborLocationListeners.add(listener);
+        getNeighborLocations(listener);
+    }
+    public static boolean removeGetNeighborLocationListener(OnGetListListener listener){
+        return neighborLocationListeners.remove(listener);
+    }
+    public static void reinitalizeNeighborLocations(){
+        if(neighborLocationListeners==null)
+            neighborLocationListeners=new ArrayList<>();
+        NeighborLocations=null;
+        getNeighborLocations(null);
+    }
+    private static void getNeighborLocations(OnGetListListener listener){
+        if(NeighborLocations ==null) {
+            NeighborLocations = new ArrayList<>();
+            Query query = getDatabase().child(Constants.LocationsNode)
+                    .orderByChild(Constants.LocationCityAtt).equalTo(getUser().getCity());
+            query.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    UserLocation uLocation=new UserLocation();
+
+                    uLocation.setData(dataSnapshot.getValue(LocationData.class));
+
+                    uLocation.setUID(dataSnapshot.getKey());
+                    NeighborLocations.add(uLocation);
+                    for (OnGetListListener listener : neighborLocationListeners)
+                        listener.onChildAdded(NeighborLocations, NeighborLocations.size() - 1);
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    UserLocation uLocation = new UserLocation();
+                    uLocation.setData(dataSnapshot.getValue(LocationData.class));
+                    String uid= dataSnapshot.getKey();
+                    int uIndex = getIndexWithUid(uid, NeighborLocations);
+                    if (uIndex != -1) {
+                        NeighborLocations.get(uIndex).setLat(uLocation.getLat()) ;
+                        NeighborLocations.get(uIndex).setLon(uLocation.getLon());
+                        for (OnGetListListener listener : neighborLocationListeners)
+                            listener.onChildChange(NeighborLocations, uIndex);
+                    }
+
+
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    String uid = dataSnapshot.getKey();
+                    int uIndex = getIndexWithUid(uid,NeighborLocations);
+                    if (uIndex != -1) {
+                        UserLocation uLocation = NeighborLocations.get(uIndex);
+                        NeighborLocations.remove(uIndex);
+                        for (OnGetListListener listener : neighborLocationListeners)
+                            listener.onChildRemove(NeighborLocations, uIndex,uLocation);
+
+
+                    }
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.i("getNeighborLocations: ", databaseError.getMessage());
+                    for (OnGetListListener listener : neighborLocationListeners)
+                        listener.onCanclled(databaseError);
+                }
+            });
+        }
+        else
+            listener.onListLoaded(NeighborLocations);
+    }
+
     public static void addGetWorldScoreListeners(OnGetListListener listener){
         if(worldScoreListeners==null)
             worldScoreListeners=new ArrayList<>();
@@ -148,12 +249,7 @@ public class DomainController {
         getWorldScoreUsersDB();
 
     }
-    private static List<User> getWorldScoreUsers(){
-        if(WorldScoreUsers==null)
-            DomainController.WorldScoreUsers= PersistenceController.getWorldUsers();
-        return WorldScoreUsers;
 
-    }
     private static void getWorldScoreUsersDB(){
         if(WorldScoreUsers ==null) {
 
@@ -179,7 +275,7 @@ public class DomainController {
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     User u = new User();
                     u.setData(dataSnapshot.getValue(UserData.class));
-                    int uIndex = getUserIndex(u.getUID(), WorldScoreUsers);
+                    int uIndex = getIndexWithUid(u.getUID(), WorldScoreUsers);
                     if (uIndex != -1) {
                         WorldScoreUsers.set(uIndex, u);
                         for (OnGetListListener listener : worldScoreListeners)
@@ -193,7 +289,7 @@ public class DomainController {
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                     User u = new User();
                     u.setData(dataSnapshot.getValue(UserData.class));
-                    int uIndex = getUserIndex(u.getUID(), WorldScoreUsers);
+                    int uIndex = getIndexWithUid(u.getUID(), WorldScoreUsers);
                     if (uIndex != -1) {
                         WorldScoreUsers.remove(uIndex);
                         for (OnGetListListener listener : worldScoreListeners)
@@ -226,7 +322,7 @@ public class DomainController {
         return PersistenceController.getMoreWorldUsers(WorldScoreUsers);
     }
 
-    public static int getUserIndex(String uid,List<? extends DBReference> list){
+    public static int getIndexWithUid(String uid, List<? extends DBReference> list){
         if(list==null)
             return -1;
         for(int i=0; i<list.size();i++)

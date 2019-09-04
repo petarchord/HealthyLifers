@@ -84,6 +84,10 @@ public class MyFriendsFragment extends Fragment {
             instance=new MyFriendsFragment();
         return instance;
     }
+
+    public static void Restart(){
+        instance=null;
+    }
     @Nullable
     @Override
 

@@ -213,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(getApplicationContext(),SignInActivity.class);
         //TODO update user account before log out.
         //TODO maybe update domain controler
+        DomainController.Logout();
         startActivity(i);
 
       //  updateUI(null);

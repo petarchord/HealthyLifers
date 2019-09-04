@@ -7,30 +7,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +33,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -62,30 +49,25 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseError;
 import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Data.UserLocationData;
+import com.healthyteam.android.healthylifers.Domain.DBReference;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.Comment;
 import com.healthyteam.android.healthylifers.Domain.User;
 import com.healthyteam.android.healthylifers.Domain.UserLocation;
 import com.karumi.dexter.BuildConfig;
+import com.squareup.picasso.Picasso;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import java.util.ArrayList;
@@ -105,7 +87,7 @@ public class MapFragment extends Fragment {
     private Context context;
 
     //map related
-    private MapView map=null;
+    private MapView map;
     private IMapController mapController=null;
     private LocationManager locationManager;
     MyLocationNewOverlay myLocationOverlay;
@@ -118,50 +100,62 @@ public class MapFragment extends Fragment {
     private LocationSettingsRequest mLocationSettingsRequest;
     private LocationRequest mLocationRequest;
 
-    private Dialog addItemDialog;
+
+
+
     private Dialog locationViewDialog;
-    private Dialog addCommentDialog;
-    private ImageButton closeCommentDialog;
-    private Fragment tabInfoFragment;
-    private Fragment tabCommentsFragment;
+    //locationView element
+    private LinearLayout layoutInfo;
+    private LinearLayout layoutComments;
+    private ImageButton closeLocationView;
     private Button infoButton;
     private Button commentsButton;
     private Button addCommentButton;
-    private ImageButton closeLocationView;
+    private ImageView imgViewLocationPic;
+    private ImageView imgViewAuthorPic;
+    private ImageView imgViewCategory;
+    private TextView txtLocationName;
+    private TextView txtAuthorName;
+    private TextView txtLikeNum;
+    private TextView txtDislikeNum;
+    private TextView txtLocationDesc;
+    private TextView txtLocationTags;
+
+    private Dialog addCommentDialog;
+    private ImageButton closeCommentDialog;
+
     private ListView commentListView;
     private ArrayList<Comment> commentsArray;
 
-
-
-
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
-    private ImageButton closeAddItem;
     private SectionsPageAdapter mSectionPageAdapter;
 
     private OnGetListListener getNeighborListener;
 
-    private LinearLayout layoutInfo;
-    private LinearLayout layoutComments;
+
 
 
     private boolean addPlace = false;
     private static MapFragment instance;
     private List<Marker> UserMarkerList;
-    private NeighbourEventHandler neighBourHandler;
+    private NeighbourEventHandler neighbourHandler;
+    private NeighbourLocationEventHandler neighbourLocationtHandler;
 
+
+    private Dialog addItemDialog;
     //dialog_add_item views
-    CheckBox cbEvent;
-    CheckBox cbCourt;
-    CheckBox cbFitnessCenter;
-    CheckBox cbHealthyFood;
-    Button btnPost;
-    Button btnAddImage;
-    ImageView imgViewLocation;
-    EditText etLocationName;
-    EditText etLocationDesc;
-    EditText etLocationTags;
-    Uri LocationPicUri;
+    private CheckBox cbEvent;
+    private CheckBox cbCourt;
+    private CheckBox cbFitnessCenter;
+    private CheckBox cbHealthyFood;
+    private Button btnPost;
+    private Button btnAddImage;
+    private ImageButton closeAddItem;
+    private ImageView imgViewLocation;
+    private EditText etLocationName;
+    private EditText etLocationDesc;
+    private EditText etLocationTags;
+    private Uri LocationPicUri;
+
     private static final int PICK_IMAGE_REQUEST = 1;
     @Nullable
     @Override
@@ -178,87 +172,14 @@ public class MapFragment extends Fragment {
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         map = layout_fragment.findViewById(R.id.MapView);
         setCurrentUserLocation();
-        //currLocation = new Location("");
         initMap();
         setLocationSettings();
-
-        //setAddLocationListener();
 
         addItemDialog = new Dialog(getContext());
         addItemDialog.setContentView(R.layout.dialog_add_item);
 
-
-        addCommentDialog = new Dialog(getContext());
-        addCommentDialog.setContentView(R.layout.dialog_add_comment);
-
-        closeCommentDialog = addCommentDialog.findViewById(R.id.closeCommentDialog);
-
-
-
-        locationViewDialog = new Dialog(context);
-        locationViewDialog.setContentView(R.layout.dialog_location_view);
-        closeLocationView = locationViewDialog.findViewById(R.id.closeLocationDialog);
-        addCommentButton = locationViewDialog.findViewById(R.id.addCommentButton);
-        layoutInfo = locationViewDialog.findViewById(R.id.layout_info);
-        layoutComments = locationViewDialog.findViewById(R.id.layout_comments);
-
-        commentListView = locationViewDialog.findViewById(R.id.comment_listView);
+        //TODO: initialize comment list
         commentsArray = new ArrayList<>();
-
-
-        infoButton = locationViewDialog.findViewById(R.id.info_button);
-        commentsButton = locationViewDialog.findViewById(R.id.comments_button);
-
-        infoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                commentsButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
-                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
-                layoutComments.setVisibility(View.GONE);
-                layoutComments.invalidate();
-                layoutInfo.setVisibility(View.VISIBLE);
-                layoutInfo.invalidate();
-
-            }
-        });
-
-        commentsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                infoButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
-                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
-                layoutComments.setVisibility(View.VISIBLE);
-                layoutComments.invalidate();
-                layoutInfo.setVisibility(View.GONE);
-                layoutInfo.invalidate();
-
-            }
-        });
-
-        addCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addCommentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                addCommentDialog.show();
-            }
-        });
-
-        closeLocationView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                locationViewDialog.dismiss();
-            }
-        });
-
-        closeCommentDialog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addCommentDialog.dismiss();
-            }
-        });
-
-
 
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -300,10 +221,14 @@ public class MapFragment extends Fragment {
             @Override
             public void onListLoaded(List<?> list) {
 
-                if(neighBourHandler!=null)
-                    DomainController.removeGetNeighborsListener(neighBourHandler);
-                neighBourHandler=new NeighbourEventHandler();
-                DomainController.addGetNeigborsListener(neighBourHandler);
+                if(neighbourHandler !=null)
+                    DomainController.removeGetNeighborsListener(neighbourHandler);
+                neighbourHandler =new NeighbourEventHandler();
+                DomainController.addGetNeigborsListener(neighbourHandler);
+                if(neighbourLocationtHandler!=null)
+                    DomainController.removeGetNeighborLocationListener(neighbourLocationtHandler);
+                neighbourLocationtHandler=new NeighbourLocationEventHandler();
+                DomainController.addGetNeigborLocationListener(neighbourLocationtHandler);
             }
 
             @Override
@@ -314,8 +239,102 @@ public class MapFragment extends Fragment {
 
     }
     //region dialog_view_item
+    void initLocationViewDialogElement(){
+        locationViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        closeLocationView = locationViewDialog.findViewById(R.id.closeLocationDialog);
 
-    //end region
+        layoutInfo = locationViewDialog.findViewById(R.id.layout_info);
+        infoButton = locationViewDialog.findViewById(R.id.info_button);
+        imgViewLocationPic =locationViewDialog.findViewById(R.id.ImageView_LocationPicDLV);
+        imgViewAuthorPic = locationViewDialog.findViewById(R.id.ImageView_AuthorDLV);
+        imgViewCategory = locationViewDialog.findViewById(R.id.ImageView_CategoryDLV);
+        txtLocationName =locationViewDialog.findViewById(R.id.TextView_LocationNameDLV);
+        txtAuthorName = locationViewDialog.findViewById(R.id.TextView_AuthorDLV);
+        txtLikeNum=locationViewDialog.findViewById(R.id.TextView_likeNumDLV);
+        txtDislikeNum = locationViewDialog.findViewById(R.id.TextView_dislikenumDLV);
+        txtLocationDesc = locationViewDialog.findViewById(R.id.TextView_LocationDescDLV);
+        txtLocationTags = locationViewDialog.findViewById(R.id.TextView_TagsDLV);
+
+
+        layoutComments = locationViewDialog.findViewById(R.id.layout_comments);
+        commentsButton = locationViewDialog.findViewById(R.id.comments_button);
+        addCommentButton = locationViewDialog.findViewById(R.id.addCommentButton);
+
+        commentListView = locationViewDialog.findViewById(R.id.ListView_CommentsDLV);
+        addCommentDialog = new Dialog(getContext());
+        addCommentDialog.setContentView(R.layout.dialog_add_comment);
+        closeCommentDialog = addCommentDialog.findViewById(R.id.closeCommentDialog);
+    }
+    void setLocationVIewElementContent(UserLocation location){
+        if(location.getImageUrl()!=null)
+            Picasso.get().load(location.getImageUrl()).into(imgViewLocationPic);
+        imgViewAuthorPic.setImageResource(R.drawable.profile_picture);
+        imgViewCategory.setImageResource(getLocationIconResurce(location.getCategory()));
+        //TODO: get Author name
+
+        txtLocationName.setText(location.getName());
+        txtLocationDesc.setText(location.getDescripition());
+        txtLocationTags.setText(location.getTagsString());
+        txtLikeNum.setText(location.getLikeCountString());
+        txtDislikeNum.setText(location.getDislikeCountString());
+    }
+
+    void setLocationViewDialogElementListener(){
+
+        closeLocationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locationViewDialog.cancel();
+            }
+        });
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                commentsButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
+                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
+                layoutComments.setVisibility(View.GONE);
+                layoutComments.invalidate();
+                layoutInfo.setVisibility(View.VISIBLE);
+                layoutInfo.invalidate();
+
+            }
+        });
+
+        commentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                infoButton.setBackgroundResource(R.color.common_google_signin_btn_text_dark_disabled);
+                v.setBackgroundResource(R.color.common_google_signin_btn_text_dark_pressed);
+                layoutComments.setVisibility(View.VISIBLE);
+                layoutComments.invalidate();
+                layoutInfo.setVisibility(View.GONE);
+                layoutInfo.invalidate();
+
+            }
+        });
+
+        addCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCommentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                addCommentDialog.show();
+            }
+        });
+
+
+        closeCommentDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCommentDialog.dismiss();
+            }
+        });
+
+
+
+    }
+
+    //endregion
     //region dialog_add_item
     void initAddLocatonDialogElement(Dialog addLocationDialog){
         cbEvent = addLocationDialog.findViewById(R.id.cbEvent);
@@ -422,7 +441,6 @@ public class MapFragment extends Fragment {
 
                 @Override
                 public void onSuccess() {
-                    //TODO: set Location icon map
                     setUsertLocationMarker(location);
                     DomainController.getUser().addPost(location);
                     addItemDialog.dismiss();
@@ -440,7 +458,6 @@ public class MapFragment extends Fragment {
                 @Override
                 public void onSuccess(Object o) {
                     addItemDialog.dismiss();
-                    //TODO: set Location icon on map
                     setUsertLocationMarker(location);
                     DomainController.getUser().addPost(location);
                 }
@@ -542,6 +559,10 @@ public class MapFragment extends Fragment {
         if(instance==null)
             instance=new MapFragment();
         return instance;
+    }
+
+    public static void Restart(){
+        instance=null;
     }
     private void initMap(){
         Context ctx = context.getApplicationContext();
@@ -646,16 +667,18 @@ public class MapFragment extends Fragment {
     }
 
 
-    private void cleanPreviusMarkers(UserLocationData user){
-        Marker array[] = addedMarkers.get(user.getUID());
+    private void cleanPreviusMarkers(DBReference reference){
+        Marker array[] = addedMarkers.get(reference.getUID());
         if(array!=null)
         {
             map.getOverlays().remove(array[0]);
             map.getOverlays().remove(array[1]);
-            addedMarkers.remove(user.getUID());
+            addedMarkers.remove(reference.getUID());
         }
     }
     private void setUserMarker(UserLocationData user){
+        if(!this.isVisible())
+            return;
         if(addedMarkers == null)
             addedMarkers=new HashMap<>();
         Marker userMarker = new Marker(map);
@@ -713,12 +736,14 @@ public class MapFragment extends Fragment {
             default: return R.drawable.ic_dashboard_black_24dp;
         }
     }
-    private void setUsertLocationMarker(UserLocation uLocation){
+    private void setUsertLocationMarker(final UserLocation uLocation){
+        if(!this.isVisible())
+            return;
         if(addedMarkers == null)
             addedMarkers=new HashMap<>();
         Marker locationMarker = new Marker(map);
         Marker textMarker = new Marker(map);
-        GeoPoint p = new GeoPoint(uLocation.getLan(), uLocation.getLon());
+        GeoPoint p = new GeoPoint(uLocation.getLat(), uLocation.getLon());
         locationMarker.setPosition(p);
 
         locationMarker.setIcon(getResources().getDrawable(getLocationIconResurce(uLocation.getCategory())));
@@ -727,8 +752,12 @@ public class MapFragment extends Fragment {
         locationMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
-                //TODO: open intitialised location view
-
+                locationViewDialog = new Dialog(context);
+                locationViewDialog.setContentView(R.layout.dialog_location_view);
+                initLocationViewDialogElement();
+                setLocationVIewElementContent(uLocation);
+                setLocationViewDialogElementListener();
+                locationViewDialog.show();
                 return true;
             }
         });
@@ -787,6 +816,44 @@ public class MapFragment extends Fragment {
         }
     }
 
+    class NeighbourLocationEventHandler implements OnGetListListener {
+
+        @Override
+        public void onChildAdded(List<?> list, int index) {
+            UserLocation uLocation = (UserLocation) list.get(index);
+            setUsertLocationMarker(uLocation);
+
+        }
+
+        @Override
+        public void onChildChange(List<?> list, int index) {
+            UserLocation uLocation = (UserLocation) list.get(index);
+            cleanPreviusMarkers(uLocation);
+            setUsertLocationMarker(uLocation);
+        }
+
+        @Override
+        public void onChildRemove(List<?> list, int index, Object removedObject) {
+
+        }
+
+        @Override
+        public void onChildMoved(List<?> list, int index) {
+
+        }
+
+        @Override
+        public void onListLoaded(List<?> list) {
+            for(UserLocation uLocation: (List<UserLocation>) list)
+                setUsertLocationMarker(uLocation);
+        }
+
+        @Override
+        public void onCanclled(DatabaseError error) {
+
+        }
+    }
+
     //function should recive Location parametar in the future
     class OsmLocationHandler implements LocationListener
     {
@@ -799,8 +866,10 @@ public class MapFragment extends Fragment {
             DomainController.getUser().updateLocation();
 
             //TODO: doesn't remove previous marker which is good for now
-            if(DomainController.getUser().updateCity(City))
+            if(DomainController.getUser().updateCity(City)) {
                 DomainController.reinitalizeNeighbors();
+                DomainController.reinitalizeNeighborLocations();
+            }
             Log.i("OSMLocationHandler: ", "Lat:" + location.getLatitude() +" Lon: " +location.getLongitude());
         }
 

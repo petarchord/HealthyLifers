@@ -1,8 +1,10 @@
 package com.healthyteam.android.healthylifers;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -31,6 +33,7 @@ import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.TestFunctions;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import static android.app.Activity.RESULT_OK;
@@ -185,6 +188,22 @@ public class MyProfileFragment extends Fragment {
         }
     }
 
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+
+    public String getRealPathFromURI(Uri uri) {
+        Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        return cursor.getString(idx);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
@@ -212,14 +231,21 @@ public class MyProfileFragment extends Fragment {
         }
         else if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode ==RESULT_OK)
         {
-            Uri imageUri = data.getData();
-            //Log.i("IMAGE URI:",imageUri.toString());
+
+        //    Uri imageUri = data.getData();
+       //     Log.i("IMAGE URI:",imageUri.toString());
         //    Bundle extras = data.getExtras();
         //    Log.i("BUNDLE EXTRAS:",extras.toString());
          //   Bitmap imageBitmap = (Bitmap) extras.get("data");
         //    ProfilePic.setImageBitmap(imageBitmap);
-            ProfilePic.setImageURI(imageUri);
-            DomainController.getUser().UpdatePicture(imageUri, new OnUploadDataListener() {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            Uri tempUri = getImageUri(getContext(), imageBitmap);
+
+
+            ProfilePic.setImageBitmap(imageBitmap);
+            DomainController.getUser().UpdatePicture(tempUri, new OnUploadDataListener() {
                 @Override
                 public void onStart() {
 

@@ -7,30 +7,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +33,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -62,6 +49,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseError;
 import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Data.UserLocationData;
+import com.healthyteam.android.healthylifers.Domain.DBReference;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.Comment;
@@ -73,20 +61,13 @@ import com.squareup.picasso.Picasso;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import java.util.ArrayList;
@@ -106,7 +87,7 @@ public class MapFragment extends Fragment {
     private Context context;
 
     //map related
-    private MapView map=null;
+    private MapView map;
     private IMapController mapController=null;
     private LocationManager locationManager;
     MyLocationNewOverlay myLocationOverlay;
@@ -140,18 +121,11 @@ public class MapFragment extends Fragment {
     private TextView txtLocationDesc;
     private TextView txtLocationTags;
 
-
-
-
     private Dialog addCommentDialog;
     private ImageButton closeCommentDialog;
 
-
-
     private ListView commentListView;
     private ArrayList<Comment> commentsArray;
-
-
 
     private SectionsPageAdapter mSectionPageAdapter;
 
@@ -163,7 +137,8 @@ public class MapFragment extends Fragment {
     private boolean addPlace = false;
     private static MapFragment instance;
     private List<Marker> UserMarkerList;
-    private NeighbourEventHandler neighBourHandler;
+    private NeighbourEventHandler neighbourHandler;
+    private NeighbourLocationEventHandler neighbourLocationtHandler;
 
 
     private Dialog addItemDialog;
@@ -202,9 +177,6 @@ public class MapFragment extends Fragment {
 
         addItemDialog = new Dialog(getContext());
         addItemDialog.setContentView(R.layout.dialog_add_item);
-
-        locationViewDialog = new Dialog(context);
-        locationViewDialog.setContentView(R.layout.dialog_location_view);
 
         //TODO: initialize comment list
         commentsArray = new ArrayList<>();
@@ -249,10 +221,14 @@ public class MapFragment extends Fragment {
             @Override
             public void onListLoaded(List<?> list) {
 
-                if(neighBourHandler!=null)
-                    DomainController.removeGetNeighborsListener(neighBourHandler);
-                neighBourHandler=new NeighbourEventHandler();
-                DomainController.addGetNeigborsListener(neighBourHandler);
+                if(neighbourHandler !=null)
+                    DomainController.removeGetNeighborsListener(neighbourHandler);
+                neighbourHandler =new NeighbourEventHandler();
+                DomainController.addGetNeigborsListener(neighbourHandler);
+                if(neighbourLocationtHandler!=null)
+                    DomainController.removeGetNeighborLocationListener(neighbourLocationtHandler);
+                neighbourLocationtHandler=new NeighbourLocationEventHandler();
+                DomainController.addGetNeigborLocationListener(neighbourLocationtHandler);
             }
 
             @Override
@@ -263,8 +239,6 @@ public class MapFragment extends Fragment {
 
     }
     //region dialog_view_item
-
-    //end region
     void initLocationViewDialogElement(){
         locationViewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         closeLocationView = locationViewDialog.findViewById(R.id.closeLocationDialog);
@@ -296,19 +270,21 @@ public class MapFragment extends Fragment {
             Picasso.get().load(location.getImageUrl()).into(imgViewLocationPic);
         imgViewAuthorPic.setImageResource(R.drawable.profile_picture);
         imgViewCategory.setImageResource(getLocationIconResurce(location.getCategory()));
-        //TODO: getAuthor name
+        //TODO: get Author name
+
         txtLocationName.setText(location.getName());
         txtLocationDesc.setText(location.getDescripition());
         txtLocationTags.setText(location.getTagsString());
         txtLikeNum.setText(location.getLikeCountString());
         txtDislikeNum.setText(location.getDislikeCountString());
     }
+
     void setLocationViewDialogElementListener(){
 
         closeLocationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                locationViewDialog.dismiss();
+                locationViewDialog.cancel();
             }
         });
         infoButton.setOnClickListener(new View.OnClickListener() {
@@ -357,6 +333,8 @@ public class MapFragment extends Fragment {
 
 
     }
+
+    //endregion
     //region dialog_add_item
     void initAddLocatonDialogElement(Dialog addLocationDialog){
         cbEvent = addLocationDialog.findViewById(R.id.cbEvent);
@@ -582,6 +560,10 @@ public class MapFragment extends Fragment {
             instance=new MapFragment();
         return instance;
     }
+
+    public static void Restart(){
+        instance=null;
+    }
     private void initMap(){
         Context ctx = context.getApplicationContext();
         mapController = map.getController();
@@ -685,16 +667,18 @@ public class MapFragment extends Fragment {
     }
 
 
-    private void cleanPreviusMarkers(UserLocationData user){
-        Marker array[] = addedMarkers.get(user.getUID());
+    private void cleanPreviusMarkers(DBReference reference){
+        Marker array[] = addedMarkers.get(reference.getUID());
         if(array!=null)
         {
             map.getOverlays().remove(array[0]);
             map.getOverlays().remove(array[1]);
-            addedMarkers.remove(user.getUID());
+            addedMarkers.remove(reference.getUID());
         }
     }
     private void setUserMarker(UserLocationData user){
+        if(!this.isVisible())
+            return;
         if(addedMarkers == null)
             addedMarkers=new HashMap<>();
         Marker userMarker = new Marker(map);
@@ -753,11 +737,13 @@ public class MapFragment extends Fragment {
         }
     }
     private void setUsertLocationMarker(final UserLocation uLocation){
+        if(!this.isVisible())
+            return;
         if(addedMarkers == null)
             addedMarkers=new HashMap<>();
         Marker locationMarker = new Marker(map);
         Marker textMarker = new Marker(map);
-        GeoPoint p = new GeoPoint(uLocation.getLan(), uLocation.getLon());
+        GeoPoint p = new GeoPoint(uLocation.getLat(), uLocation.getLon());
         locationMarker.setPosition(p);
 
         locationMarker.setIcon(getResources().getDrawable(getLocationIconResurce(uLocation.getCategory())));
@@ -766,6 +752,8 @@ public class MapFragment extends Fragment {
         locationMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
+                locationViewDialog = new Dialog(context);
+                locationViewDialog.setContentView(R.layout.dialog_location_view);
                 initLocationViewDialogElement();
                 setLocationVIewElementContent(uLocation);
                 setLocationViewDialogElementListener();
@@ -828,6 +816,44 @@ public class MapFragment extends Fragment {
         }
     }
 
+    class NeighbourLocationEventHandler implements OnGetListListener {
+
+        @Override
+        public void onChildAdded(List<?> list, int index) {
+            UserLocation uLocation = (UserLocation) list.get(index);
+            setUsertLocationMarker(uLocation);
+
+        }
+
+        @Override
+        public void onChildChange(List<?> list, int index) {
+            UserLocation uLocation = (UserLocation) list.get(index);
+            cleanPreviusMarkers(uLocation);
+            setUsertLocationMarker(uLocation);
+        }
+
+        @Override
+        public void onChildRemove(List<?> list, int index, Object removedObject) {
+
+        }
+
+        @Override
+        public void onChildMoved(List<?> list, int index) {
+
+        }
+
+        @Override
+        public void onListLoaded(List<?> list) {
+            for(UserLocation uLocation: (List<UserLocation>) list)
+                setUsertLocationMarker(uLocation);
+        }
+
+        @Override
+        public void onCanclled(DatabaseError error) {
+
+        }
+    }
+
     //function should recive Location parametar in the future
     class OsmLocationHandler implements LocationListener
     {
@@ -840,8 +866,10 @@ public class MapFragment extends Fragment {
             DomainController.getUser().updateLocation();
 
             //TODO: doesn't remove previous marker which is good for now
-            if(DomainController.getUser().updateCity(City))
+            if(DomainController.getUser().updateCity(City)) {
                 DomainController.reinitalizeNeighbors();
+                DomainController.reinitalizeNeighborLocations();
+            }
             Log.i("OSMLocationHandler: ", "Lat:" + location.getLatitude() +" Lon: " +location.getLongitude());
         }
 

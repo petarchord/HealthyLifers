@@ -65,6 +65,9 @@ public class MyProfileFragment extends Fragment {
             instance=new MyProfileFragment();
         return instance;
     }
+    public static void Restart(){
+        instance=null;
+    }
 
 
     @Nullable

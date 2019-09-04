@@ -3,12 +3,14 @@ package com.healthyteam.android.healthylifers;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -60,6 +62,7 @@ public class MyProfileFragment extends Fragment {
     private static MyProfileFragment instance;
 
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 101;
     public static MyProfileFragment getInstance(){
         if(instance==null)
             instance=new MyProfileFragment();
@@ -143,7 +146,9 @@ public class MyProfileFragment extends Fragment {
         btnTakePic.setOnClickListener(new View.OnClickListener() {
                                           @Override
                                           public void onClick(View v) {
-                                              setRadnomImageUri();
+                                            //  setRadnomImageUri();
+                                              openCamera();
+
                                           }});
         dialogBtnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,6 +176,16 @@ public class MyProfileFragment extends Fragment {
         startActivityForResult(intent,PICK_IMAGE_REQUEST);
     }
 
+    void openCamera()
+    {
+        Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if(imageTakeIntent.resolveActivity(getContext().getPackageManager()) != null)
+        {
+            startActivityForResult(imageTakeIntent,REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
@@ -179,6 +194,32 @@ public class MyProfileFragment extends Fragment {
             mImageUri = data.getData();
             ProfilePic.setImageURI(mImageUri);
             DomainController.getUser().UpdatePicture(mImageUri, new OnUploadDataListener() {
+                @Override
+                public void onStart() {
+
+                }
+
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailed(Exception e) {
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode ==RESULT_OK)
+        {
+            Uri imageUri = data.getData();
+            Log.i("IMAGE URI:",imageUri.toString());
+        //    Bundle extras = data.getExtras();
+        //    Log.i("BUNDLE EXTRAS:",extras.toString());
+         //   Bitmap imageBitmap = (Bitmap) extras.get("data");
+        //    ProfilePic.setImageBitmap(imageBitmap);
+            ProfilePic.setImageURI(imageUri);
+            DomainController.getUser().UpdatePicture(imageUri, new OnUploadDataListener() {
                 @Override
                 public void onStart() {
 

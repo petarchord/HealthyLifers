@@ -47,12 +47,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.google.firebase.database.DatabaseError;
+import com.healthyteam.android.healthylifers.Data.LocationData;
 import com.healthyteam.android.healthylifers.Data.OnUploadDataListener;
 import com.healthyteam.android.healthylifers.Data.UserLocationData;
 import com.healthyteam.android.healthylifers.Domain.DBReference;
 import com.healthyteam.android.healthylifers.Domain.DomainController;
 import com.healthyteam.android.healthylifers.Domain.OnGetListListener;
 import com.healthyteam.android.healthylifers.Domain.Comment;
+import com.healthyteam.android.healthylifers.Domain.OnGetObjectListener;
 import com.healthyteam.android.healthylifers.Domain.User;
 import com.healthyteam.android.healthylifers.Domain.UserLocation;
 import com.karumi.dexter.BuildConfig;
@@ -265,19 +267,25 @@ public class MapFragment extends Fragment {
         addCommentDialog.setContentView(R.layout.dialog_add_comment);
         closeCommentDialog = addCommentDialog.findViewById(R.id.closeCommentDialog);
     }
-    void setLocationVIewElementContent(UserLocation location){
+    void setLocationVIewElementContent(UserLocation location,User user){
         if(location.getImageUrl()!=null)
             Picasso.get().load(location.getImageUrl()).into(imgViewLocationPic);
-        imgViewAuthorPic.setImageResource(R.drawable.profile_picture);
+
         imgViewCategory.setImageResource(getLocationIconResurce(location.getCategory()));
         //TODO: get Author name
-
+        if(user.getImageUrl()!=null)
+            Picasso.get().load(user.getImageUrl()).into(imgViewAuthorPic);
+        else
+            imgViewAuthorPic.setImageResource(R.drawable.profile_picture);
+        txtAuthorName.setText(user.getUsername());
         txtLocationName.setText(location.getName());
         txtLocationDesc.setText(location.getDescripition());
         txtLocationTags.setText(location.getTagsString());
         txtLikeNum.setText(location.getLikeCountString());
         txtDislikeNum.setText(location.getDislikeCountString());
     }
+
+
 
     void setLocationViewDialogElementListener(){
 
@@ -333,6 +341,18 @@ public class MapFragment extends Fragment {
 
 
     }
+    void startLocationViewDialog(final UserLocation location){
+        initLocationViewDialogElement();
+        User.getUser(location.getAuthorUID(), new OnGetObjectListener() {
+            @Override
+            public void OnSuccess(Object o) {
+                User user = (User) o;
+                setLocationVIewElementContent(location,user);
+                setLocationViewDialogElementListener();
+                locationViewDialog.show();
+            }
+        });
+    }
 
     //endregion
     //region dialog_add_item
@@ -366,6 +386,7 @@ public class MapFragment extends Fragment {
         cbEvent.setChecked(false);
         cbFitnessCenter.setChecked(false);
         cbHealthyFood.setChecked(false);
+        imgViewLocation.setImageResource(0);
     }
     void configAddLocationDialogElements(){
         final UserLocation newLocation = new UserLocation();
@@ -677,8 +698,9 @@ public class MapFragment extends Fragment {
         }
     }
     private void setUserMarker(UserLocationData user){
-        if(!this.isVisible())
-            return;
+        //TODO: ERROR: marker doesnt set when switch between tabs
+        //if(!this.isVisible())
+          //  return;
         if(addedMarkers == null)
             addedMarkers=new HashMap<>();
         Marker userMarker = new Marker(map);
@@ -737,8 +759,7 @@ public class MapFragment extends Fragment {
         }
     }
     private void setUsertLocationMarker(final UserLocation uLocation){
-        if(!this.isVisible())
-            return;
+        //TODO: ERROR: marker doesnt set when switch between tabs
         if(addedMarkers == null)
             addedMarkers=new HashMap<>();
         Marker locationMarker = new Marker(map);
@@ -754,10 +775,7 @@ public class MapFragment extends Fragment {
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 locationViewDialog = new Dialog(context);
                 locationViewDialog.setContentView(R.layout.dialog_location_view);
-                initLocationViewDialogElement();
-                setLocationVIewElementContent(uLocation);
-                setLocationViewDialogElementListener();
-                locationViewDialog.show();
+                startLocationViewDialog(uLocation);
                 return true;
             }
         });

@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_map);
 
+
         settingsDialog = new Dialog(this);
 
         settingsDialog.setContentView(R.layout.dialog_settings);
@@ -207,7 +208,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    public int getSelectedTabId(){
+        return navigation.getSelectedItemId();
+    }
     private void signOut() {
         mAuth.signOut();
         Intent i = new Intent(getApplicationContext(),SignInActivity.class);

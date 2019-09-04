@@ -171,7 +171,6 @@ public class MyProfileFragment extends Fragment {
     }
     void openFileChooser(){
         Intent intent = new Intent();
-        intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent,PICK_IMAGE_REQUEST);
     }
@@ -179,7 +178,7 @@ public class MyProfileFragment extends Fragment {
     void openCamera()
     {
         Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
+        imageTakeIntent.setType("image/");
         if(imageTakeIntent.resolveActivity(getContext().getPackageManager()) != null)
         {
             startActivityForResult(imageTakeIntent,REQUEST_IMAGE_CAPTURE);
@@ -190,8 +189,9 @@ public class MyProfileFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
-            Log.i("onChoosePic:", mImageUri.getPath());
             mImageUri = data.getData();
+            Log.i("onChoosePic:", mImageUri.getPath());
+
             ProfilePic.setImageURI(mImageUri);
             DomainController.getUser().UpdatePicture(mImageUri, new OnUploadDataListener() {
                 @Override
@@ -213,7 +213,7 @@ public class MyProfileFragment extends Fragment {
         else if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode ==RESULT_OK)
         {
             Uri imageUri = data.getData();
-            Log.i("IMAGE URI:",imageUri.toString());
+            //Log.i("IMAGE URI:",imageUri.toString());
         //    Bundle extras = data.getExtras();
         //    Log.i("BUNDLE EXTRAS:",extras.toString());
          //   Bitmap imageBitmap = (Bitmap) extras.get("data");
